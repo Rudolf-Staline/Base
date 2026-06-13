@@ -5,22 +5,43 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm --filter @basekit/playground dev",
-    "build": "pnpm -r build",
-    "typecheck": "pnpm -r typecheck",
-    "lint": "pnpm typecheck",
-    "clean": "pnpm -r clean && rm -rf node_modules"
+    "dev:docs": "pnpm --filter @basekit/docs dev",
+    "build": "pnpm build:packages && pnpm build:apps",
+    "build:packages": "tsc -b",
+    "build:apps": "pnpm --filter @basekit/playground --filter @basekit/docs build",
+    "typecheck": "tsc -b && pnpm --filter @basekit/playground --filter @basekit/docs typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
+    "gen:css": "pnpm --filter @basekit/tokens gen:css",
+    "clean": "tsc -b --clean && pnpm -r clean && rm -rf node_modules"
   },
   "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@types/node": "^22.10.5",
+    "@testing-library/react": "^16.1.0",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "@vitejs/plugin-react": "latest",
     "autoprefixer": "latest",
+    "esbuild": "^0.25.0",
+    "eslint": "^9.18.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.14.0",
+    "jsdom": "^25.0.1",
     "postcss": "latest",
+    "prettier": "^3.4.2",
     "react": "latest",
     "react-dom": "latest",
     "tailwindcss": "^3.4.17",
     "typescript": "latest",
-    "vite": "latest"
+    "typescript-eslint": "^8.20.0",
+    "vite": "latest",
+    "vitest": "^2.1.8"
   },
   "packageManager": "pnpm@9.15.0"
 }

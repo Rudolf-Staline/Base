@@ -4,10 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
+    "dev": "vite",
     "build": "tsc -p tsconfig.json && vite build",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "pnpm typecheck",
+    "typecheck": "tsc -p tsconfig.json",
+    "preview": "vite preview",
     "clean": "rm -rf dist .turbo node_modules/.vite"
   },
   "dependencies": {
@@ -15,11 +15,15 @@
     "@basekit/core": "workspace:*",
     "@basekit/tokens": "workspace:*",
     "@basekit/ui": "workspace:*",
-    "@vitejs/plugin-react": "latest",
-    "vite": "latest",
-    "typescript": "latest",
     "react": "latest",
     "react-dom": "latest"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@vitejs/plugin-react": "latest",
+    "autoprefixer": "latest",
+    "postcss": "latest",
+    "tailwindcss": "^3.4.17",
+    "typescript": "latest",
+    "vite": "latest"
+  }
 }

@@ -1,0 +1,12 @@
+{
+  "name": "@basekit/templates",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "Project starter templates for BaseKit-based apps.",
+  "scripts": {
+    "build": "echo \"@basekit/templates: starter files, nothing to build\"",
+    "typecheck": "echo \"@basekit/templates: nothing to typecheck\"",
+    "clean": "echo \"@basekit/templates: nothing to clean\""
+  }
+}

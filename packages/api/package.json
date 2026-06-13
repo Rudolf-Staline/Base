@@ -5,10 +5,9 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "pnpm typecheck",
-    "clean": "rm -rf dist .turbo node_modules/.vite"
+    "build": "tsc -b",
+    "typecheck": "tsc -b",
+    "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
   "exports": {
     ".": {

@@ -1,154 +1,248 @@
-# Basekit
+# BaseKit
 
-Basekit est un socle frontend React/Vite/TypeScript pour démarrer des produits plus vite sans disperser la logique de design, de composition de pages et d'accès API.
+> Un design system TypeScript, un page builder déclaratif et un renderer React — le tout dans un monorepo.
 
-## Vision du projet
+BaseKit est une boîte à outils pour construire des applications internes denses (dashboards,
+back-offices, outils métier) rapidement et de façon cohérente. Chaque composant existe sous
+deux formes : un composant React classique (JSX) **et** une fabrique déclarative qui produit
+un arbre de nœuds (`UINode`) rendu par un renderer maison. Le style passe exclusivement par
+des **tokens** : aucune couleur brute (`bg-blue-500`) n'apparaît jamais dans une page.
 
-La V1 fournit un monorepo importable dans de vrais projets : tokens centralisés, composants React typés, fonctions déclaratives créant des `UINode`, renderer React, layouts applicatifs, playground et client HTTP générique.
+## Vision
+
+- **Un vocabulaire visuel unique.** `tone`, `variant`, `size`, `radius`, `shadow` : les mêmes
+  mots partout, sur tous les composants.
+- **Thématisation globale.** Les couleurs sont des rôles sémantiques (`primary`, `surface`,
+  `border`…) résolus en variables CSS `--bk-*`. Light et dark sans toucher au code composant.
+- **Pages déclaratives.** Une page = une fonction pure `state → UINode`. L'état, les actions
+  et le chargement de données sont gérés par le runtime.
+- **Pas de logique métier dans l'UI.** Les composants et le client HTTP sont génériques ;
+  le métier vit dans les apps.
 
 ## Installation
 
 ```bash
-pnpm install
-pnpm dev
+pnpm install      # installe tout le monorepo
+pnpm dev          # lance le playground (apps/playground) sur http://localhost:5173
 ```
+
+> Pré-requis : Node 18+ et `pnpm` (le projet épingle `pnpm@9.15.0`).
 
 ## Commandes
 
-```bash
-pnpm dev        # démarre apps/playground
-pnpm build      # build tous les packages et apps
-pnpm typecheck  # vérifie TypeScript partout
-pnpm lint       # alias de vérification typée pour cette V1
-pnpm clean      # supprime les artefacts générés
-```
+| Commande          | Effet                                                   |
+| ----------------- | ------------------------------------------------------- |
+| `pnpm install`    | Installe les dépendances de tout le workspace           |
+| `pnpm dev`        | Lance le playground (Vite, `@basekit/playground`)       |
+| `pnpm dev:docs`   | Lance l'app docs (`@basekit/docs`)                      |
+| `pnpm build`      | Build les packages (`tsc -b`) puis les apps             |
+| `pnpm typecheck`  | Vérifie les types des packages et des apps              |
+| `pnpm test`       | Lance les tests une fois (Vitest)                       |
+| `pnpm test:watch` | Tests en mode watch                                     |
+| `pnpm lint`       | ESLint sur tout le repo                                 |
+| `pnpm format`     | Prettier (écriture) sur `**/*.{ts,tsx,md,json}`         |
+| `pnpm clean`      | Nettoie `dist`, build infos et `node_modules`           |
+| `pnpm gen:css`    | Régénère `packages/tokens/theme.css` depuis `colors.ts` |
 
 ## Architecture
 
-```txt
-apps/
-  playground/       Démo interactive réelle
-  docs/             Documentation légère exécutable
-packages/
-  tokens/           Couleurs, tailles, espacements, radius, ombres, variantes et types
-  core/             UINode, createNode, createComponent, createPage, renderNode
-  ui/               Composants React + factories déclaratives + layouts
-  api/              Client HTTP générique typé
-  config/           Configuration partagée
-examples/
-  dashboard-demo/   Exemple de consommation dashboard
-  form-demo/        Exemple de consommation formulaire
+```
+Base/
+├─ packages/
+│  ├─ tokens/   @basekit/tokens   couleurs, tailles, preset Tailwind, theme.css
+│  ├─ core/     @basekit/core     modèle de nœuds, factory, renderer, page builder, utils
+│  ├─ ui/       @basekit/ui       ~50 composants (View + factory + props) + registry
+│  ├─ api/      @basekit/api      client HTTP générique typé + mock
+│  └─ config/   @basekit/config   config TS/ESLint partagée (privé)
+└─ apps/
+   ├─ playground/  @basekit/playground  démos de tous les composants + pages
+   └─ docs/        @basekit/docs        site de documentation
 ```
 
-## Principes d’architecture
-
-1. Les pages assemblent des composants.
-2. Les composants ne contiennent pas de logique métier.
-3. Les styles passent par les tokens.
-4. Les couleurs arbitraires sont interdites.
-5. Les composants doivent être composables.
-6. Les composants interactifs exposent leurs événements.
-7. Les composants de formulaire supportent `value` et `defaultValue`.
-8. Les composants riches utilisent `children`, slots ou sous-composants.
-9. Le renderer transforme les `UINode` en React.
-10. Le design system doit rester modifiable globalement.
+Les packages se compilent avec les **project references** TypeScript (`tsc -b`). En dev, les
+apps utilisent Vite avec des **alias** qui pointent `@basekit/*` directement sur les sources :
+aucun build intermédiaire nécessaire pendant le développement.
 
 ## Packages
 
-- `@basekit/tokens` : source de vérité des couleurs, tailles, espacements, radius, ombres, variantes et types TypeScript.
-- `@basekit/core` : primitives déclaratives (`UINode`, `UIChild`, `createNode`, `createComponent`, `normalizeChildren`, `createPage`, `renderNode`, `renderChildren`).
-- `@basekit/ui` : composants React (`ButtonView`, `InputView`, `DataTableView`...) et fonctions déclaratives (`Button`, `Input`, `DataTable`...).
-- `@basekit/api` : `createApiClient`, `ApiError`, méthodes `get`, `post`, `put`, `patch`, `delete`.
-- `@basekit/config` : base de configuration partagée.
+| Package           | Rôle                                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `@basekit/tokens` | Source unique de vérité visuelle : valeurs TS, variables CSS, preset Tailwind                                                              |
+| `@basekit/core`   | Moteur déclaratif : `UINode`, `createComponent`, `createRegistry`, `renderNode`, `createPage`, `usePageRuntime`, utils (`cn`, `variants`…) |
+| `@basekit/ui`     | Bibliothèque de composants + `defaultRegistry` + `RenderNode`                                                                              |
+| `@basekit/api`    | `createApiClient`, `createMockClient`, `ApiError`                                                                                          |
+| `@basekit/config` | Configuration partagée (privée, non publiée)                                                                                               |
 
-## Tokens
+## Deux façons d'utiliser un composant
 
-Les pages consommatrices doivent préférer :
-
-```tsx
-<ButtonView tone="primary" variant="solid" size="md" />
-<Text tone="danger" value="Erreur" />
-```
-
-Les composants UI utilisent des variables `--bk-*` dérivées de `@basekit/tokens`. Les classes de couleurs arbitraires dans les pages sont à éviter ; si une couleur manque, elle doit être ajoutée aux tokens.
-
-## Composants
-
-Les composants exposent des props communes (`id`, `className`, `children`, `tone`, `variant`, `size`, `disabled`, `hidden`, `testId`) et des props métier d'interface :
-
-- `Button` : texte, slots d'icône, loading, fullWidth, événements souris/focus/click.
-- `Input` et `DateInput` : modes contrôlé/non contrôlé, `value`, `defaultValue`, aides, erreurs, slots, dates min/max.
-- `Card` : composition React avec `Card.Header`, `Card.Content`, `Card.Footer`, `Card.Title`, `Card.Description`.
-- `DataTable` : colonnes typées, `rowKey`, états loading/vide, lignes hover/striped/compactes.
-- Layouts : `AppShell`, `DashboardLayout`, `AuthLayout`, `ReaderLayout`, `SettingsLayout`.
-
-## Exemples React
+Chaque composant est exporté **trois fois** : `XView` (React/JSX), `X` (fabrique déclarative),
+`XProps` (types). Exemple avec `Button` :
 
 ```tsx
-<Card.View variant="elevated">
-  <Card.Header>
-    <Card.Title>Statistiques</Card.Title>
-    <Card.Description>Performance du modèle</Card.Description>
-  </Card.Header>
-  <Card.Content>
-    <MetricCardView label="Accuracy" value="92.4%" tone="success" />
-  </Card.Content>
-  <Card.Footer>
-    <ButtonView variant="ghost">Voir détail</ButtonView>
-  </Card.Footer>
-</Card.View>
+import { ButtonView, Button } from "@basekit/ui";
+
+// 1. React (JSX)
+<ButtonView tone="primary" onClick={save}>
+  Enregistrer
+</ButtonView>;
+
+// 2. Déclaratif (produit un UINode)
+const node = Button({ text: "Enregistrer", tone: "primary", onClick: save });
 ```
 
-## Exemples déclaratifs
+Pour afficher un arbre déclaratif, on le passe à `RenderNode` :
 
-```ts
-const page = Page({
-  id: "login",
-  layout: "auth",
-  title: "Connexion",
-  content: Stack({
-    gap: "md",
-    children: [
-      Text({ value: "Bienvenue", textVariant: "title", tone: "primary" }),
-      Input({ id: "email", label: "Email", value: state.email, onValueChange: setEmail }),
-      Button({ text: "Se connecter", tone: "primary", onClick: login }),
-    ],
-  }),
+```tsx
+import { RenderNode, Stack, Button } from "@basekit/ui";
+
+const tree = Stack({
+  gap: "md",
+  children: [
+    Button({ text: "Annuler", variant: "ghost" }),
+    Button({ text: "Valider", tone: "primary" }),
+  ],
 });
+
+<RenderNode node={tree} />;
 ```
 
-Rendu React :
+`RenderNode` utilise le `defaultRegistry` (qui mappe chaque nom — `"Button"`, `"Stack"`… — à
+son `XView`). Un composant inconnu n'explose pas : il rend un marqueur visible.
+
+## Créer une page
+
+Une page combine `createPage` (définition typée) et `usePageRuntime` (exécution). Le `view`
+est une fonction pure qui reçoit `state`, `actions`, `data` et retourne un arbre déclaratif.
+Exemple réel (`apps/playground/src/pages/OperationsPage.tsx`) :
 
 ```tsx
-<RenderNode node={page} />
-```
+import { createPage, usePageRuntime } from "@basekit/core";
+import {
+  Button,
+  DataTable,
+  DateInput,
+  FilterBar,
+  Grid,
+  MetricCard,
+  Page,
+  RenderNode,
+  Stack,
+} from "@basekit/ui";
 
-## Création d’une page
+type State = { startDate: string; endDate: string };
+type Actions = { setStartDate: (v: string) => void; resetFilters: () => void };
+type Data = { operations: Operation[] };
 
-```ts
-export const OperationValidatedPage = createPage({
+const operationsPage = createPage<State, Actions, Data>({
   id: "operations.validated",
   layout: "dashboard",
+  title: "Opérations validées",
   state: { startDate: "", endDate: "" },
+  data: () => ({ operations }),
+  actions: ({ setState }) => ({
+    setStartDate: (startDate) => setState({ startDate }),
+    resetFilters: () => setState({ startDate: "", endDate: "" }),
+  }),
   view: ({ state, actions, data }) =>
     Page({
       title: "Opérations validées",
-      content: [
-        FilterBar({
-          title: "Filtrer par période",
-          fields: [
-            DateInput({ label: "Date de début", value: state.startDate, onValueChange: actions.setStartDate }),
-            DateInput({ label: "Date de fin", value: state.endDate, onValueChange: actions.setEndDate }),
-          ],
-          actions: [Button({ text: "Réinitialiser", tone: "neutral", variant: "soft", onClick: actions.resetFilters })],
-        }),
-        DataTable({ rows: data.operations, columns: operationColumns, emptyText: "Aucune opération" }),
-      ],
+      content: Stack({
+        gap: "lg",
+        children: [
+          FilterBar({
+            title: "Filtrer par période",
+            fields: [
+              DateInput({
+                id: "startDate",
+                label: "Date de début",
+                value: state.startDate,
+                onValueChange: actions.setStartDate,
+                clearable: true,
+              }),
+            ],
+            actions: [
+              Button({
+                text: "Réinitialiser",
+                tone: "neutral",
+                variant: "soft",
+                onClick: actions.resetFilters,
+              }),
+            ],
+          }),
+          Grid({
+            columns: 3,
+            children: [
+              MetricCard({
+                label: "Lignes",
+                value: data.operations.length,
+                tone: "primary",
+              }),
+            ],
+          }),
+          DataTable<Operation>({
+            rows: data.operations,
+            columns: operationColumns,
+            rowKey: "id",
+            striped: true,
+          }),
+        ],
+      }),
     }),
 });
+
+export const OperationsPage = () => {
+  const { node } = usePageRuntime(operationsPage);
+  return <RenderNode node={node} />;
+};
 ```
 
-Le playground inclut Dashboard, Form, DataTable, OperationValidatedPage, ReaderLayout et variantes de composants.
+Détails complets : [`docs/page-builder.md`](docs/page-builder.md).
+
+## Créer un composant
+
+Un composant BaseKit suit toujours le même patron (voir [`docs/conventions.md`](docs/conventions.md)) :
+
+```tsx
+// 1. La vue React
+export type StatProps = { label: string; value: string; tone?: Tone };
+export const StatView = ({ label, value, tone = "neutral" }: StatProps) => (
+  <div className="rounded-md bg-surface p-4">
+    <p className="text-bk-sm text-muted-foreground">{label}</p>
+    <p className="text-xl font-semibold text-foreground">{value}</p>
+  </div>
+);
+
+// 2. La fabrique déclarative
+export const Stat = createComponent<StatProps>("Stat");
+```
+
+Puis on enregistre `StatView` sous la clé `"Stat"` dans `packages/ui/src/registry.tsx` et on
+exporte le tout depuis `packages/ui/src/index.tsx`.
+
+## Tokens
+
+Les composants ne référencent jamais une couleur brute, seulement des **classes sémantiques**
+fournies par le preset Tailwind `basekitPreset` : `bg-surface`, `text-muted-foreground`,
+`border-border`, `bg-primary-soft`… Ces classes résolvent vers des variables `--bk-*`.
+
+Une app doit :
+
+1. importer une fois `@basekit/tokens/theme.css` (les variables) ;
+2. ajouter le preset à sa config Tailwind :
+
+```ts
+import { basekitPreset } from "@basekit/tokens/preset";
+export default {
+  presets: [basekitPreset],
+  content: [
+    /* … */
+  ],
+};
+```
+
+Le thème sombre s'active en ajoutant la classe `.dark` sur `document.documentElement`. Pour
+ajouter un token, on édite `packages/tokens/src/colors.ts` puis on lance `pnpm gen:css`.
+Voir [`docs/tokens.md`](docs/tokens.md).
 
 ## Couche API
 
@@ -156,36 +250,54 @@ Le playground inclut Dashboard, Form, DataTable, OperationValidatedPage, ReaderL
 import { createApiClient } from "@basekit/api";
 
 const api = createApiClient({
-  baseUrl: import.meta.env.VITE_API_URL,
+  baseUrl: "https://api.exemple.fr",
   getToken: () => localStorage.getItem("token"),
-  timeoutMs: 8000,
 });
 
-const user = await api.get<User>("/me");
+const me = await api.get<User>("/me");
+await api.post<User>("/users", { name: "Ada" });
 ```
 
-Le package API est volontairement générique : aucune logique métier, headers configurables, token optionnel, timeout et réponses typées.
+Les erreurs non-2xx, timeouts et pannes réseau lèvent un `ApiError` (`status`, `payload`,
+`url`, `isNetworkError`). `createMockClient(routes)` fournit un client en mémoire pour les
+démos et tests. Voir [`docs/api-layer.md`](docs/api-layer.md).
 
-## Utiliser Basekit dans un autre projet
+## Playground
 
-1. Publier ou référencer les packages `@basekit/*`.
-2. Installer `@basekit/tokens`, `@basekit/core`, `@basekit/ui` et éventuellement `@basekit/api`.
-3. Importer les styles Tailwind de l'application consommatrice et scanner `node_modules/@basekit/ui` si nécessaire.
-4. Utiliser les composants React directement ou créer des pages déclaratives rendues par `RenderNode`.
+`pnpm dev` lance `apps/playground` : une vitrine de tous les composants, des layouts
+(dashboard, formulaire, reader), de la page déclarative (`OperationsPage`) et d'une démo API.
+C'est le meilleur endroit pour voir le système en action et la bascule clair/sombre.
 
-## Comment ajouter un composant
+## Conventions
 
-1. Ajouter les props typées dans `packages/ui/src/index.tsx`.
-2. Créer la vue React `NomView`.
-3. Créer la factory déclarative avec `createComponent<NomProps>("Nom")`.
-4. Enregistrer la vue dans `registry`.
-5. Ajouter une démonstration dans `apps/playground`.
-6. Lancer `pnpm typecheck`, `pnpm lint` et `pnpm build`.
+- Pas de logique métier dans `@basekit/ui` ni `@basekit/api`.
+- Pas de Tailwind brut ni de couleurs arbitraires dans les pages : tout passe par les tokens.
+- Composants petits et focalisés, types exportés, tests sur les composants critiques.
+- Nommage : `XView` / `X` / `XProps`, regroupés par catégorie (`primitives/`, `layout/`,
+  `composition/`, `feedback/`, `data/`, `form/`).
 
-## Règles de contribution
+Détails : [`docs/conventions.md`](docs/conventions.md).
 
-- Pas de logique métier dans les composants.
-- Pas de couleurs arbitraires dans les pages.
-- Préférer tokens, props déclaratives, slots et composition.
-- Conserver les packages génériques et importables.
-- Toute nouvelle API doit être typée et démontrée dans le playground.
+## Limites actuelles (V1)
+
+- Pas de Storybook (le playground tient ce rôle).
+- Validation de formulaire minimale (pas de schéma intégré).
+- `DataTable` non virtualisée (rendu de toutes les lignes).
+- Un seul renderer (React) — le modèle `UINode` est prévu pour en accueillir d'autres.
+- Packages non publiés sur un registre (consommés via le workspace).
+
+## Prochaines étapes
+
+Voir [`docs/roadmap.md`](docs/roadmap.md) : validation de formulaire enrichie, `DataTable`
+virtualisée, `CommandPalette`, renderers additionnels, publication des packages, tests de
+régression visuelle.
+
+## Documentation
+
+- [Architecture](docs/architecture.md)
+- [Composants](docs/components.md)
+- [Page builder](docs/page-builder.md)
+- [Tokens](docs/tokens.md)
+- [Couche API](docs/api-layer.md)
+- [Conventions](docs/conventions.md)
+- [Roadmap](docs/roadmap.md)

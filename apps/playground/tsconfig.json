@@ -1,1 +1,14 @@
-{"extends":"../../tsconfig.base.json","compilerOptions":{"outDir":"dist","rootDir":"../../","noEmit":true},"include":["src"]}
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@basekit/tokens": ["../../packages/tokens/src/index.ts"],
+      "@basekit/tokens/preset": ["../../packages/tokens/src/tailwindPreset.ts"],
+      "@basekit/core": ["../../packages/core/src/index.ts"],
+      "@basekit/ui": ["../../packages/ui/src/index.tsx"],
+      "@basekit/api": ["../../packages/api/src/index.ts"]
+    }
+  },
+  "include": ["src", "vite.config.ts"]
+}

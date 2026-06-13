@@ -103,8 +103,6 @@ importers:
         specifier: latest
         version: 19.2.7
 
-  packages/templates: {}
-
   packages/tokens: {}
 
   packages/ui:

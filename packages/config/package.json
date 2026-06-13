@@ -1,0 +1,1 @@
+{"name":"@basekit/config","version":"0.1.0","type":"module","private":true,"exports":{"./tailwind":"./tailwind.config.ts"}}

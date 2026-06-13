@@ -7,9 +7,17 @@
     "./tailwind": "./tailwind.config.ts"
   },
   "scripts": {
-    "build": "echo \"No build required\"",
-    "typecheck": "echo \"No typecheck required\"",
-    "lint": "echo \"No lint required\"",
-    "clean": "rm -rf dist"
+    "build": "echo \"@basekit/config: nothing to build\"",
+    "typecheck": "echo \"@basekit/config: nothing to typecheck\"",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@basekit/tokens": "workspace:*"
+  },
+  "peerDependencies": {
+    "tailwindcss": "^3.4.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
   }
 }

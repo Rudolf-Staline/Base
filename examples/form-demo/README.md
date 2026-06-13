@@ -1,3 +1,9 @@
 # Form demo
 
-Exemple minimal : composez `Page({ content: Stack({ children: [Input(...), DateInput(...), Button(...)] }) })` puis rendez le nœud avec `RenderNode`.
+Formulaire contrôlé avec validation simple, construit avec `FormView`,
+`FormSectionView`, `FormActionsView` et les champs (`InputView`, `SelectView`…).
+
+Référence à copier-coller (non compilée par le monorepo). Version exécutable :
+`apps/playground` → onglet _Formulaire_.
+
+Voir `App.example.tsx`.

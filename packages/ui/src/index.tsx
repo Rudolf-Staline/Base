@@ -1,69 +1,262 @@
-import React, { type ReactNode } from "react";
-import { cn, createComponent, renderNode, type ComponentRegistry, type UIChild, type UINode, Page as PageNode } from "@basekit/core";
-import type { Align, Justify, Radius, Shadow, Size, Tone, Variant } from "@basekit/tokens";
-import { themeCssVariables } from "@basekit/tokens";
+/**
+ * @basekit/ui — the component library.
+ *
+ * Every component is exported three ways so it works in any style:
+ *  - `XView`     the React component (use in JSX)
+ *  - `X`         the declarative factory (use in `UINode` trees)
+ *  - `XProps`    the prop types
+ *
+ * Plus the renderer glue (`RenderNode`, `defaultRegistry`, `registerComponent`)
+ * and ready-to-use layouts.
+ */
 
-export type BaseComponentProps = { id?: string; className?: string; children?: UIChild | UIChild[]; tone?: Tone; variant?: Variant; size?: Size; disabled?: boolean; hidden?: boolean; testId?: string };
-const tokenTone: Record<Tone, string> = { neutral: "var(--bk-neutral)", primary: "var(--bk-primary)", accent: "var(--bk-accent)", success: "var(--bk-success)", warning: "var(--bk-warning)", danger: "var(--bk-danger)" };
-const buttonVariant = (tone: Tone, variant: Variant) => ({ color: variant === "solid" ? "var(--bk-textInverted)" : tokenTone[tone], backgroundColor: variant === "solid" ? tokenTone[tone] : variant === "soft" ? "var(--bk-surfaceRaised)" : "transparent", borderColor: variant === "outline" ? tokenTone[tone] : "transparent" });
-const sizeClass: Record<Size, string> = { xs: "px-2 py-1 text-xs", sm: "px-3 py-1.5 text-sm", md: "px-4 py-2 text-sm", lg: "px-5 py-2.5 text-base", xl: "px-6 py-3 text-lg" };
-const gapClass: Record<Size, string> = { xs: "gap-1", sm: "gap-2", md: "gap-4", lg: "gap-6", xl: "gap-8" };
-const alignClass: Record<Align, string> = { start: "items-start", center: "items-center", end: "items-end", stretch: "items-stretch" };
-const justifyClass: Record<Justify, string> = { start: "justify-start", center: "justify-center", end: "justify-end", between: "justify-between" };
+// Renderer & registry
+export {
+  RenderNode,
+  defaultRegistry,
+  registerComponent,
+  registerComponents,
+} from "./registry";
 
-export type ButtonProps = BaseComponentProps & { text?: string; type?: "button" | "submit" | "reset"; loading?: boolean; fullWidth?: boolean; iconLeft?: ReactNode; iconRight?: ReactNode; onClick?: React.MouseEventHandler<HTMLButtonElement>; onMouseEnter?: React.MouseEventHandler<HTMLButtonElement>; onMouseLeave?: React.MouseEventHandler<HTMLButtonElement>; onFocus?: React.FocusEventHandler<HTMLButtonElement>; onBlur?: React.FocusEventHandler<HTMLButtonElement> };
-export const ButtonView = ({ text, children, tone = "primary", variant = "solid", size = "md", loading, fullWidth, iconLeft, iconRight, className, testId, hidden, disabled, style, ...props }: ButtonProps & { style?: React.CSSProperties }) => hidden ? null : <button data-testid={testId} disabled={disabled || loading} className={cn("inline-flex items-center justify-center gap-2 rounded-lg border font-medium transition disabled:cursor-not-allowed disabled:opacity-60", sizeClass[size], fullWidth && "w-full", className)} style={{ ...buttonVariant(tone, variant), ...style }} {...props}>{loading ? "Chargement…" : <>{iconLeft}{children ?? text}{iconRight}</>}</button>;
-export const Button = createComponent<ButtonProps>("Button");
+// Page builder (re-exported from core for one-import ergonomics)
+export {
+  Page,
+  DashboardPage,
+  AuthPage,
+  SettingsPage,
+  ReaderPage,
+  FormPage,
+  createPage,
+  usePageRuntime,
+  type PageNodeProps,
+  type PageDefinition,
+  type PageContext,
+  type PageLayout,
+} from "@basekit/core";
 
-export type InputProps = BaseComponentProps & { name?: string; label?: string; type?: React.HTMLInputTypeAttribute; value?: string | number; defaultValue?: string | number; placeholder?: string; minValue?: number | string; maxValue?: number | string; error?: string; helperText?: string; required?: boolean; leftSlot?: ReactNode; rightSlot?: ReactNode; onChange?: React.ChangeEventHandler<HTMLInputElement>; onChangeValue?: (value: string) => void; onValueChange?: (value: string) => void; onFocus?: React.FocusEventHandler<HTMLInputElement>; onBlur?: React.FocusEventHandler<HTMLInputElement> };
-export const InputView = ({ label, error, helperText, leftSlot, rightSlot, onChange, onChangeValue, onValueChange, minValue, maxValue, className, testId, hidden, tone: _tone, variant: _variant, size: _size, children: _children, ...props }: InputProps) => hidden ? null : <label className={cn("block space-y-1.5", className)}><span className="text-sm font-medium text-[var(--bk-text)]">{label}{props.required ? " *" : ""}</span><span className="flex items-center gap-2 rounded-lg border border-[var(--bk-border)] bg-[var(--bk-surface)] px-3 py-2 focus-within:border-[var(--bk-primary)]">{leftSlot}<input data-testid={testId} className="w-full bg-transparent text-[var(--bk-text)] outline-none placeholder:text-[var(--bk-textMuted)]" min={minValue} max={maxValue} onChange={(event) => { onChange?.(event); onChangeValue?.(event.target.value); onValueChange?.(event.target.value); }} {...props} />{rightSlot}</span>{error ? <span className="text-sm text-[var(--bk-danger)]">{error}</span> : helperText ? <span className="text-sm text-[var(--bk-textMuted)]">{helperText}</span> : null}</label>;
-export const Input = createComponent<InputProps>("Input");
-export type DateInputProps = Omit<InputProps, "type" | "onChangeValue"> & { clearable?: boolean; onValueChange?: (value: string) => void };
-export const DateInputView = ({ clearable, onValueChange, value, rightSlot, ...props }: DateInputProps) => <InputView type="date" value={value} onValueChange={onValueChange} rightSlot={clearable && value ? <button type="button" className="text-[var(--bk-textMuted)]" onClick={() => onValueChange?.("")}>×</button> : rightSlot} {...props} />;
-export const DateInput = createComponent<DateInputProps>("DateInput");
+// Shared types
+export type {
+  BaseComponentProps,
+  RadiusProp,
+  ShadowProp,
+} from "./internal/props";
+export { Icon, type IconName, type IconProps } from "./internal/Icon";
+export type { IconSlot } from "./internal";
 
-export type TextProps = BaseComponentProps & { value?: ReactNode; as?: "p" | "span" | "h1" | "h2" | "h3"; textVariant?: "body" | "title" | "subtitle" | "caption" };
-export const TextView = ({ value, children, as = "p", textVariant = "body", tone = "neutral", className, hidden }: TextProps) => hidden ? null : React.createElement(as, { className: cn(textVariant === "title" && "text-3xl font-bold", textVariant === "subtitle" && "text-xl font-semibold", textVariant === "caption" && "text-sm", className), style: { color: tokenTone[tone] } }, (children as ReactNode) ?? value);
-export const Text = createComponent<TextProps>("Text");
-export type StackProps = BaseComponentProps & { gap?: Size; align?: Align; justify?: Justify; padding?: Size };
-export const StackView = ({ gap = "md", align = "stretch", justify = "start", children, className, hidden }: StackProps) => hidden ? null : <div className={cn("flex flex-col", gapClass[gap], alignClass[align], justifyClass[justify], className)}>{children as ReactNode}</div>;
-export const Stack = createComponent<StackProps>("Stack");
-export type GridProps = BaseComponentProps & { columns?: 1 | 2 | 3 | 4; gap?: Size };
-export const GridView = ({ columns = 2, gap = "md", children, className }: GridProps) => <div className={cn("grid", gapClass[gap], columns === 2 && "md:grid-cols-2", columns === 3 && "md:grid-cols-3", columns === 4 && "md:grid-cols-4", className)}>{children as ReactNode}</div>;
-export const Grid = createComponent<GridProps>("Grid");
+// Primitives
+export {
+  ButtonView,
+  Button,
+  IconButtonView,
+  IconButton,
+} from "./primitives/Button";
+export type { ButtonProps, IconButtonProps } from "./primitives/Button";
+export {
+  InputView,
+  Input,
+  TextareaView,
+  Textarea,
+  FieldShell,
+} from "./primitives/Input";
+export type { InputProps, TextareaProps } from "./primitives/Input";
+export { DateInputView, DateInput } from "./primitives/DateInput";
+export type { DateInputProps } from "./primitives/DateInput";
+export { SelectView, Select } from "./primitives/Select";
+export type { SelectProps, SelectOption } from "./primitives/Select";
+export {
+  CheckboxView,
+  Checkbox,
+  SwitchView,
+  Switch,
+} from "./primitives/Toggle";
+export type { CheckboxProps, SwitchProps } from "./primitives/Toggle";
+export { TextView, Text, HeadingView, Heading } from "./primitives/Text";
+export type { TextProps, HeadingProps } from "./primitives/Text";
+export {
+  BadgeView,
+  Badge,
+  LinkView,
+  Link,
+  AvatarView,
+  Avatar,
+  DividerView,
+  Divider,
+  KbdView,
+  Kbd,
+  SpinnerView,
+  Spinner,
+} from "./primitives/Misc";
+export type {
+  BadgeProps,
+  LinkProps,
+  AvatarProps,
+  DividerProps,
+  KbdProps,
+  SpinnerProps,
+} from "./primitives/Misc";
 
-export type CardProps = Omit<BaseComponentProps, "variant"> & { variant?: "plain" | "outlined" | "elevated"; radius?: Radius; shadow?: Shadow; padding?: Size };
-const CardRoot = ({ variant = "outlined", children, className, hidden }: CardProps) => hidden ? null : <article className={cn("rounded-xl bg-[var(--bk-surface)]", variant === "outlined" && "border border-[var(--bk-border)]", variant === "elevated" && "shadow-md", className)}>{children as ReactNode}</article>;
-const CardHeaderView = ({ title, description, children }: { title?: ReactNode; description?: ReactNode; children?: ReactNode }) => <header className="border-b border-[var(--bk-border)] p-5">{children ?? <><h3 className="font-semibold text-[var(--bk-text)]">{title}</h3>{description && <p className="text-sm text-[var(--bk-textMuted)]">{description}</p>}</>}</header>;
-const CardContentView = ({ children }: { children?: ReactNode }) => <div className="p-5">{children}</div>;
-const CardFooterView = ({ children }: { children?: ReactNode }) => <footer className="border-t border-[var(--bk-border)] p-5">{children}</footer>;
-export const Card = Object.assign(createComponent<CardProps>("Card"), { View: CardRoot, Header: CardHeaderView, Content: CardContentView, Footer: CardFooterView, Title: ({ children }: { children?: ReactNode }) => <h3 className="font-semibold text-[var(--bk-text)]">{children}</h3>, Description: ({ children }: { children?: ReactNode }) => <p className="text-sm text-[var(--bk-textMuted)]">{children}</p> });
-export const CardHeader = createComponent<{ title?: ReactNode; description?: ReactNode }>("CardHeader");
-export const CardContent = createComponent<{ children?: UIChild | UIChild[] }>("CardContent");
-export const CardFooter = createComponent<{ children?: UIChild | UIChild[] }>("CardFooter");
+// Layout
+export {
+  StackView,
+  Stack,
+  InlineView,
+  Inline,
+  GridView,
+  Grid,
+  ContainerView,
+  Container,
+  SectionView,
+  Section,
+  ScrollAreaView,
+  ScrollArea,
+  SplitPaneView,
+  SplitPane,
+} from "./layout/Primitives";
+export type {
+  StackProps,
+  InlineProps,
+  GridProps,
+  ContainerProps,
+  SectionProps,
+  ScrollAreaProps,
+  SplitPaneProps,
+} from "./layout/Primitives";
+export {
+  AppShellView,
+  AppShell,
+  SidebarView,
+  Sidebar,
+  TopbarView,
+  Topbar,
+  PageHeaderView,
+  PageHeader,
+} from "./layout/Shell";
+export type {
+  AppShellProps,
+  SidebarProps,
+  SidebarNavItem,
+  TopbarProps,
+  PageHeaderProps,
+} from "./layout/Shell";
+export {
+  PageView,
+  DashboardLayout,
+  AuthLayout,
+  ReaderLayout,
+  SettingsLayout,
+  FormLayout,
+} from "./layout/Layouts";
+export type {
+  PageViewProps,
+  DashboardLayoutProps,
+  AuthLayoutProps,
+  ReaderLayoutProps,
+  SettingsLayoutProps,
+  FormLayoutProps,
+} from "./layout/Layouts";
 
-export type DataTableColumn<T extends object> = { id: string; header: ReactNode; accessor?: keyof T; cell?: (row: T) => ReactNode | UINode; align?: "left" | "right" | "center" };
-export const Column = <T extends object,>(column: DataTableColumn<T>) => column;
-export type DataTableProps<T extends object> = { rows: T[]; columns: DataTableColumn<T>[]; rowKey?: keyof T | ((row: T, index: number) => React.Key); loading?: boolean; emptyText?: string; striped?: boolean; hoverable?: boolean; compact?: boolean; footer?: ReactNode; onRowClick?: (row: T) => void };
-export const DataTableView = <T extends object,>({ rows, columns, loading, emptyText = "Aucune donnée", striped, hoverable, compact, footer, rowKey, onRowClick }: DataTableProps<T>) => <div className="overflow-hidden rounded-xl border border-[var(--bk-border)] bg-[var(--bk-surface)]"><table className="w-full text-left text-sm"><thead className="bg-[var(--bk-surfaceRaised)] text-[var(--bk-textMuted)]"><tr>{columns.map((column) => <th key={column.id} className={cn(compact ? "px-3 py-2" : "px-4 py-3", "font-medium")}>{column.header}</th>)}</tr></thead><tbody>{loading ? <tr><td className="p-6" colSpan={columns.length}>Chargement…</td></tr> : rows.length === 0 ? <tr><td className="p-6 text-center text-[var(--bk-textMuted)]" colSpan={columns.length}>{emptyText}</td></tr> : rows.map((row, index) => <tr key={typeof rowKey === "function" ? rowKey(row, index) : rowKey ? String(row[rowKey]) : index} onClick={() => onRowClick?.(row)} className={cn(striped && index % 2 === 1 && "bg-[var(--bk-surfaceRaised)]", hoverable && "cursor-pointer hover:bg-[var(--bk-surfaceRaised)]")}>{columns.map((column) => <td key={column.id} className={compact ? "px-3 py-2" : "px-4 py-3"}>{column.cell ? renderNode(column.cell(row) as UIChild, registry) : column.accessor ? String(row[column.accessor] ?? "") : null}</td>)}</tr>)}</tbody>{footer && <tfoot>{footer}</tfoot>}</table></div>;
-export const DataTable = <T extends object>(props: DataTableProps<T>) => ({ component: "DataTable", props: props as unknown as Record<string, unknown>, children: [] });
-export const MetricCardView = ({ label, value, tone = "neutral" }: { label: string; value: ReactNode; tone?: Tone }) => <CardRoot><CardContentView><p className="text-sm text-[var(--bk-textMuted)]">{label}</p><TextView as="p" textVariant="title" tone={tone} value={value} /></CardContentView></CardRoot>;
-export const MetricCard = createComponent<{ label: string; value: ReactNode; tone?: Tone }>("MetricCard");
-export const AlertView = ({ children, tone = "primary", title }: { children?: ReactNode; tone?: Tone; title?: ReactNode }) => <div className="rounded-lg border border-[var(--bk-border)] bg-[var(--bk-surfaceRaised)] p-4" style={{ color: tokenTone[tone] }}><strong>{title}</strong><div>{children}</div></div>;
-export const Alert = createComponent<{ children?: UIChild | UIChild[]; tone?: Tone; title?: ReactNode }>("Alert");
-export const EmptyStateView = ({ title = "Aucun résultat", description }: { title?: ReactNode; description?: ReactNode }) => <div className="rounded-xl border border-dashed border-[var(--bk-border)] p-8 text-center"><h3 className="font-semibold text-[var(--bk-text)]">{title}</h3><p className="text-[var(--bk-textMuted)]">{description}</p></div>;
-export const EmptyState = createComponent<{ title?: ReactNode; description?: ReactNode }>("EmptyState");
-export const PageView = ({ title, description, children, actions }: { title?: ReactNode; description?: ReactNode; children?: ReactNode; actions?: ReactNode }) => <main className="space-y-6"><div className="flex items-start justify-between gap-4"><div><h1 className="text-3xl font-bold text-[var(--bk-text)]">{title}</h1>{description && <p className="text-[var(--bk-textMuted)]">{description}</p>}</div><div>{actions}</div></div>{children}</main>;
-export const FilterBar = createComponent<{ title: string; icon?: string; fields: UIChild[]; actions?: UIChild[] }>("FilterBar");
-export const FilterBarView = ({ title, fields, actions }: { title: string; fields: UIChild[]; actions?: UIChild[] }) => <CardRoot variant="outlined"><CardHeaderView title={title} /><CardContentView><div className="grid gap-4 md:grid-cols-3">{fields.map((field, index) => <React.Fragment key={`field-${index}`}>{renderNode(field, registry)}</React.Fragment>)}{actions?.map((action, index) => <React.Fragment key={`action-${index}`}>{renderNode(action, registry)}</React.Fragment>)}</div></CardContentView></CardRoot>;
+// Composition
+export {
+  Card,
+  CardView,
+  CardHeader,
+  CardContent,
+  CardFooter,
+  CardHeaderView,
+  CardContentView,
+  CardFooterView,
+  CardTitleView,
+  CardDescriptionView,
+} from "./composition/Card";
+export type { CardProps } from "./composition/Card";
+export { ModalView, Modal, DrawerView, Drawer } from "./composition/Modal";
+export type { ModalProps, DrawerProps } from "./composition/Modal";
+export {
+  TabsView,
+  Tabs,
+  AccordionView,
+  Accordion,
+  DropdownView,
+  Dropdown,
+} from "./composition/Disclosure";
+export type {
+  TabsProps,
+  TabItem,
+  AccordionProps,
+  AccordionItem,
+  DropdownProps,
+  DropdownItem,
+} from "./composition/Disclosure";
 
-export const registry: ComponentRegistry = { Button: ButtonView as React.ComponentType<Record<string, unknown>>, Input: InputView as React.ComponentType<Record<string, unknown>>, DateInput: DateInputView as React.ComponentType<Record<string, unknown>>, Text: TextView as React.ComponentType<Record<string, unknown>>, Stack: StackView as React.ComponentType<Record<string, unknown>>, Grid: GridView as React.ComponentType<Record<string, unknown>>, Card: CardRoot as React.ComponentType<Record<string, unknown>>, CardHeader: CardHeaderView as React.ComponentType<Record<string, unknown>>, CardContent: CardContentView as React.ComponentType<Record<string, unknown>>, CardFooter: CardFooterView as React.ComponentType<Record<string, unknown>>, DataTable: DataTableView as React.ComponentType<Record<string, unknown>>, MetricCard: MetricCardView as React.ComponentType<Record<string, unknown>>, Alert: AlertView as React.ComponentType<Record<string, unknown>>, EmptyState: EmptyStateView as React.ComponentType<Record<string, unknown>>, Page: PageView as React.ComponentType<Record<string, unknown>>, FilterBar: FilterBarView as React.ComponentType<Record<string, unknown>> };
-export const RenderNode = ({ node }: { node: UIChild }) => <>{renderNode(node, registry)}</>;
-export type AppShellProps = { sidebar?: ReactNode; topbar?: ReactNode; children?: ReactNode };
-export const AppShell = ({ sidebar, topbar, children }: AppShellProps) => <div className="min-h-screen bg-[var(--bk-background)] text-[var(--bk-text)]" style={themeCssVariables() as React.CSSProperties}><aside className="fixed inset-y-0 w-64 border-r border-[var(--bk-border)] bg-[var(--bk-surface)] p-6">{sidebar}</aside><div className="ml-64"><header className="border-b border-[var(--bk-border)] bg-[var(--bk-surface)] p-4">{topbar}</header><div className="p-8">{children}</div></div></div>;
-export const DashboardLayout = ({ children, sidebar = <b>basekit</b>, topbar = "Playground" }: AppShellProps) => <AppShell sidebar={sidebar} topbar={topbar}>{children}</AppShell>;
-export const AuthLayout = ({ children }: { children?: ReactNode }) => <div className="grid min-h-screen place-items-center bg-[var(--bk-background)] p-6" style={themeCssVariables() as React.CSSProperties}><div className="w-full max-w-md">{children}</div></div>;
-export const ReaderLayout = ({ children, sidebar, secondaryPanel, focusMode }: { children?: ReactNode; sidebar?: ReactNode; secondaryPanel?: ReactNode; focusMode?: boolean }) => <div className="min-h-screen bg-[var(--bk-background)] text-[var(--bk-text)]" style={themeCssVariables() as React.CSSProperties}><div className={cn("grid gap-6 p-6", focusMode ? "grid-cols-1" : "lg:grid-cols-[16rem_1fr_18rem]")}><nav className={focusMode ? "hidden" : "block"}>{sidebar}</nav><main className="mx-auto w-full max-w-3xl rounded-xl bg-[var(--bk-surface)] p-8">{children}</main>{!focusMode && <aside>{secondaryPanel}</aside>}</div></div>;
-export const SettingsLayout = DashboardLayout;
-export const IconButton = Button; export const Textarea = Input; export const Select = Input; export const Checkbox = Input; export const Switch = Input; export const Badge = Text; export const Link = Text; export const Inline = Stack; export const Container = Stack; export const Section = Stack; export const Sidebar = Stack; export const Topbar = Stack; export const PageHeader = Text; export const Modal = Card; export const Tabs = Stack; export const Accordion = Stack; export const Dropdown = Stack; export const Spinner = Text; export const Skeleton = Stack; export const ErrorState = EmptyState; export const Toast = Alert; export const StatBlock = MetricCard;
-export { PageNode as Page };
+// Feedback
+export {
+  AlertView,
+  Alert,
+  CalloutView,
+  Callout,
+  EmptyStateView,
+  EmptyState,
+  ErrorStateView,
+  ErrorState,
+} from "./feedback/Alert";
+export type {
+  AlertProps,
+  CalloutProps,
+  EmptyStateProps,
+  ErrorStateProps,
+} from "./feedback/Alert";
+export {
+  SkeletonView,
+  Skeleton,
+  ProgressView,
+  Progress,
+} from "./feedback/Status";
+export type { SkeletonProps, ProgressProps } from "./feedback/Status";
+export { ToastProvider, useToast, type Toast } from "./feedback/Toast";
+
+// Data
+export { DataTableView, DataTable, Column } from "./data/DataTable";
+export type { DataTableProps, DataTableColumn } from "./data/DataTable";
+export {
+  MetricCardView,
+  MetricCard,
+  StatBlockView,
+  StatBlock,
+  ListView,
+  List,
+  DescriptionListView,
+  DescriptionList,
+  TimelineView,
+  Timeline,
+} from "./data/Display";
+export type {
+  MetricCardProps,
+  StatBlockProps,
+  ListProps,
+  ListItem,
+  DescriptionListProps,
+  DescriptionItem,
+  TimelineProps,
+  TimelineItem,
+} from "./data/Display";
+
+// Form
+export {
+  FormView,
+  Form,
+  FormSectionView,
+  FormSection,
+  FormFieldView,
+  FormField,
+  FormActionsView,
+  FormActions,
+  FilterBarView,
+  FilterBar,
+} from "./form/Form";
+export type {
+  FormProps,
+  FormSectionProps,
+  FormFieldProps,
+  FormActionsProps,
+  FilterBarProps,
+} from "./form/Form";

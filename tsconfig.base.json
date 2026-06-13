@@ -2,16 +2,15 @@
   "compilerOptions": {
     "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -20,19 +19,6 @@
     "jsx": "react-jsx",
     "declaration": true,
     "declarationMap": true,
-    "paths": {
-      "@basekit/tokens": [
-        "./packages/tokens/src/index.ts"
-      ],
-      "@basekit/core": [
-        "./packages/core/src/index.ts"
-      ],
-      "@basekit/ui": [
-        "./packages/ui/src/index.tsx"
-      ],
-      "@basekit/api": [
-        "./packages/api/src/index.ts"
-      ]
-    }
+    "sourceMap": true
   }
 }

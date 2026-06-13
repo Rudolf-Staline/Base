@@ -1,1 +1,19 @@
-{"name":"@basekit/api","version":"0.1.0","type":"module","main":"./dist/index.js","types":"./dist/index.d.ts","scripts":{"build":"tsc -p tsconfig.json","typecheck":"tsc -p tsconfig.json --noEmit"},"exports":{".":{"types":"./dist/index.d.ts","import":"./dist/index.js"}}}
+{
+  "name": "@basekit/api",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "pnpm typecheck",
+    "clean": "rm -rf dist .turbo node_modules/.vite"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  }
+}

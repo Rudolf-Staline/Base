@@ -54,10 +54,7 @@ export const ModalView = ({
   if (!open || typeof document === "undefined") return null;
 
   return createPortal(
-    <div
-      className="fixed inset-0 z-modal flex items-center justify-center p-4"
-      style={{ zIndex: 1300 }}
-    >
+    <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
         onClick={dismissable ? onClose : undefined}
@@ -139,7 +136,7 @@ export const DrawerView = ({
   if (!open || typeof document === "undefined") return null;
 
   return createPortal(
-    <div className="fixed inset-0" style={{ zIndex: 1200 }}>
+    <div className="fixed inset-0 z-drawer">
       <div
         className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
         onClick={dismissable ? onClose : undefined}

@@ -3,6 +3,7 @@ import { shadows } from "./shadows";
 import { spacing } from "./spacing";
 import { fontFamilies, fontSizes } from "./typography";
 import { breakpoints } from "./spacing";
+import { zIndex } from "./transitions";
 
 /**
  * Tailwind preset that exposes the design tokens as *semantic* utilities.
@@ -96,6 +97,9 @@ export const basekitPreset = {
         "bk-xl": fontSizes.xl,
       },
       screens: breakpoints,
+      zIndex: Object.fromEntries(
+        Object.entries(zIndex).map(([key, value]) => [key, String(value)]),
+      ),
       ringColor: { DEFAULT: "var(--bk-ring)" },
     },
   },

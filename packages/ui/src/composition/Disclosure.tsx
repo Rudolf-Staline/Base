@@ -190,7 +190,6 @@ export const DropdownView = ({
             "absolute z-dropdown mt-1 min-w-[12rem] rounded-lg border border-border bg-surface-raised p-1 shadow-soft",
             align === "end" ? "right-0" : "left-0",
           )}
-          style={{ zIndex: 1100 }}
         >
           {items.map((item) => (
             <button

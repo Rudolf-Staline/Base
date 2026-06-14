@@ -1,0 +1,25 @@
+import { useState, type ChangeEvent } from "react";
+import { createComponent } from "@basekit/core";
+import { ButtonView } from "./Button";
+import { InputView, type InputProps } from "./Input";
+
+export const TextInputView = (props: InputProps) => <InputView type="text" {...props} />;
+export const TextInput = createComponent<InputProps>("TextInput");
+export type NumberInputProps = Omit<InputProps,"type"|"onChangeValue"|"onValueChange"|"minValue"|"maxValue"> & { minValue?: number; maxValue?: number; step?: number; clampOnBlur?: boolean; onNumberChange?: (value: number | null) => void; onValueChange?: (value: string) => void };
+export const NumberInputView = ({ minValue, maxValue, step, clampOnBlur, onNumberChange, onValueChange, onBlur, ...props }: NumberInputProps) => <InputView type="number" minValue={minValue} maxValue={maxValue} {...props} onChangeValue={(v)=>{onValueChange?.(v); onNumberChange?.(v === "" ? null : Number(v));}} onBlur={(e)=>{ if(clampOnBlur){ let n=Number(e.currentTarget.value); if(!Number.isNaN(n)){ if(minValue!=null)n=Math.max(n,minValue); if(maxValue!=null)n=Math.min(n,maxValue); e.currentTarget.value=String(n); onNumberChange?.(n); }} onBlur?.(e); }} rightSlot={step ? <span className="text-muted-foreground">±{step}</span> : props.rightSlot} />;
+export const NumberInput = createComponent<NumberInputProps>("NumberInput");
+export type PasswordInputProps = InputProps & { showToggle?: boolean; visible?: boolean; onVisibleChange?: (visible: boolean) => void };
+export const PasswordInputView = ({ showToggle=true, visible, onVisibleChange, rightSlot, ...props }: PasswordInputProps) => { const [internal,setInternal]=useState(false); const isVisible=visible ?? internal; return <InputView type={isVisible ? "text" : "password"} {...props} rightSlot={showToggle ? <ButtonView type="button" size="xs" variant="ghost" text={isVisible ? "Masquer" : "Afficher"} onClick={()=>{setInternal(!isVisible); onVisibleChange?.(!isVisible);}} /> : rightSlot} />; };
+export const PasswordInput = createComponent<PasswordInputProps>("PasswordInput");
+export type SearchInputProps = InputProps & { clearable?: boolean; loading?: boolean; onClear?: () => void };
+export const SearchInputView = ({ clearable, loading, onClear, rightSlot, leftSlot="⌕", value, onValueChange, ...props }: SearchInputProps) => <InputView type="search" value={value} onValueChange={onValueChange} leftSlot={leftSlot} {...props} rightSlot={loading ? <span>…</span> : clearable && value ? <ButtonView type="button" size="xs" variant="ghost" text="Effacer" onClick={()=>{onValueChange?.(""); onClear?.();}} /> : rightSlot} />;
+export const SearchInput = createComponent<SearchInputProps>("SearchInput");
+export const EmailInputView = (props: InputProps) => <InputView type="email" autoComplete="email" {...props} />; export const EmailInput = createComponent<InputProps>("EmailInput");
+export const PhoneInputView = (props: InputProps) => <InputView type="tel" autoComplete="tel" {...props} />; export const PhoneInput = createComponent<InputProps>("PhoneInput");
+export const UrlInputView = (props: InputProps) => <InputView type="url" {...props} />; export const UrlInput = createComponent<InputProps>("UrlInput");
+export type FileInputProps = Omit<InputProps,"type"|"value"|"defaultValue"|"onChangeValue"|"onValueChange"> & { accept?: string; multiple?: boolean; maxSize?: number; onFilesChange?: (files: File[]) => void };
+export const FileInputView = ({ accept, multiple, maxSize, onFilesChange, onChange, ...props }: FileInputProps) => <InputView type="file" {...props} accept={accept} onChange={(e: ChangeEvent<HTMLInputElement>)=>{onChange?.(e); const files=Array.from(e.target.files ?? []).filter(f=>!maxSize || f.size<=maxSize); onFilesChange?.(files);}} rightSlot={multiple ? <span className="text-muted-foreground">multi</span> : props.rightSlot} />;
+export const FileInput = createComponent<FileInputProps>("FileInput");
+export type DropzoneProps = FileInputProps;
+export const DropzoneView = (props: DropzoneProps) => <div className="rounded-lg border border-dashed border-input bg-muted/30 p-4"><FileInputView {...props} /></div>;
+export const Dropzone = createComponent<DropzoneProps>("Dropzone");

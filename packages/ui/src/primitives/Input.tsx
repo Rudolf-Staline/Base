@@ -92,6 +92,7 @@ export type InputProps = {
   leftSlot?: ReactNode;
   rightSlot?: ReactNode;
   autoComplete?: string;
+  accept?: string;
   testId?: string;
   onChange?: InputHTMLAttributes<HTMLInputElement>["onChange"];
   /** Value-first change handler — the ergonomic default. */
@@ -124,6 +125,7 @@ export const InputView = forwardRef<HTMLInputElement, InputProps>(
       leftSlot,
       rightSlot,
       autoComplete,
+      accept,
       testId,
       onChange,
       onChangeValue,
@@ -166,6 +168,7 @@ export const InputView = forwardRef<HTMLInputElement, InputProps>(
             required={required}
             readOnly={readOnly}
             autoComplete={autoComplete}
+            accept={accept}
             data-testid={testId}
             aria-invalid={error ? true : undefined}
             aria-describedby={describedBy}
@@ -194,7 +197,7 @@ export const Input = createComponent<InputProps>("Input");
 export type TextareaProps = Omit<
   InputProps,
   "type" | "leftSlot" | "rightSlot" | "minValue" | "maxValue"
-> & { rows?: number };
+> & { rows?: number; minRows?: number; maxLength?: number; showCount?: boolean; resize?: "none" | "vertical" | "horizontal" | "both" };
 
 export const TextareaView = forwardRef<HTMLTextAreaElement, TextareaProps>(
   function TextareaView(
@@ -213,6 +216,10 @@ export const TextareaView = forwardRef<HTMLTextAreaElement, TextareaProps>(
       hidden,
       className,
       rows = 4,
+      minRows,
+      maxLength,
+      showCount,
+      resize = "vertical",
       testId,
       onChange,
       onChangeValue,
@@ -243,7 +250,8 @@ export const TextareaView = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           id={id_}
           name={name}
-          rows={rows}
+          rows={minRows ?? rows}
+          maxLength={maxLength}
           value={value}
           defaultValue={defaultValue}
           placeholder={placeholder}
@@ -258,6 +266,9 @@ export const TextareaView = forwardRef<HTMLTextAreaElement, TextareaProps>(
             fieldBorder(Boolean(error)),
             focusRing,
             "py-2 leading-relaxed",
+            resize === "none" && "resize-none",
+            resize === "vertical" && "resize-y",
+            resize === "horizontal" && "resize-x",
           )}
           onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
             onChange?.(event as unknown as React.ChangeEvent<HTMLInputElement>);
@@ -271,6 +282,7 @@ export const TextareaView = forwardRef<HTMLTextAreaElement, TextareaProps>(
             onBlur as unknown as TextareaHTMLAttributes<HTMLTextAreaElement>["onBlur"]
           }
         />
+        {showCount && maxLength ? <p className="text-right text-bk-xs text-muted-foreground">{String(value ?? defaultValue ?? "").length}/{maxLength}</p> : null}
       </FieldShell>
     );
   },

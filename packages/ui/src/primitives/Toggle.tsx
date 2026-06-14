@@ -7,6 +7,9 @@ export type CheckboxProps = {
   name?: string;
   label?: ReactNode;
   description?: ReactNode;
+  helperText?: ReactNode;
+  error?: ReactNode;
+  indeterminate?: boolean;
   checked?: boolean;
   defaultChecked?: boolean;
   disabled?: boolean;
@@ -15,6 +18,7 @@ export type CheckboxProps = {
   className?: string;
   testId?: string;
   onChange?: (checked: boolean) => void;
+  onCheckedChange?: (checked: boolean) => void;
 };
 
 export const CheckboxView = forwardRef<HTMLInputElement, CheckboxProps>(
@@ -24,6 +28,9 @@ export const CheckboxView = forwardRef<HTMLInputElement, CheckboxProps>(
       name,
       label,
       description,
+      helperText,
+      error,
+      indeterminate,
       checked,
       defaultChecked,
       disabled,
@@ -32,6 +39,7 @@ export const CheckboxView = forwardRef<HTMLInputElement, CheckboxProps>(
       className,
       testId,
       onChange,
+      onCheckedChange,
     },
     ref,
   ) {
@@ -58,13 +66,14 @@ export const CheckboxView = forwardRef<HTMLInputElement, CheckboxProps>(
             disabled={disabled}
             required={required}
             data-testid={testId}
+            data-indeterminate={indeterminate ? true : undefined}
             className="peer sr-only"
-            onChange={(event) => onChange?.(event.target.checked)}
+            onChange={(event) => { onChange?.(event.target.checked); onCheckedChange?.(event.target.checked); }}
           />
           <span
             className={cn(
               "h-5 w-5 rounded-md border border-input bg-surface transition-colors",
-              "peer-checked:border-primary peer-checked:bg-primary",
+              "peer-checked:border-primary peer-checked:bg-primary peer-data-[indeterminate=true]:border-primary peer-data-[indeterminate=true]:bg-primary",
               "peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background",
             )}
             aria-hidden
@@ -72,22 +81,24 @@ export const CheckboxView = forwardRef<HTMLInputElement, CheckboxProps>(
           <Icon
             name="check"
             size={14}
-            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-primary-foreground opacity-0 transition-opacity peer-checked:opacity-100"
+            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-primary-foreground opacity-0 transition-opacity peer-checked:opacity-100 peer-data-[indeterminate=true]:opacity-100"
             aria-hidden
           />
         </span>
-        {(label != null || description != null) && (
+        {(label != null || description != null || helperText != null || error != null) && (
           <span className="flex flex-col">
             {label != null && (
               <span className="text-bk-sm font-medium text-foreground">
                 {label}
               </span>
             )}
-            {description != null && (
+            {error != null ? (
+              <span className="text-bk-sm text-danger">{error}</span>
+            ) : (description != null || helperText != null) ? (
               <span className="text-bk-sm text-muted-foreground">
-                {description}
+                {description ?? helperText}
               </span>
-            )}
+            ) : null}
           </span>
         )}
       </label>
@@ -116,6 +127,7 @@ export const SwitchView = forwardRef<HTMLInputElement, SwitchProps>(
       className,
       testId,
       onChange,
+      onCheckedChange,
     },
     ref,
   ) {
@@ -143,7 +155,7 @@ export const SwitchView = forwardRef<HTMLInputElement, SwitchProps>(
             disabled={disabled}
             data-testid={testId}
             className="peer sr-only"
-            onChange={(event) => onChange?.(event.target.checked)}
+            onChange={(event) => { onChange?.(event.target.checked); onCheckedChange?.(event.target.checked); }}
           />
           <span
             className={cn(

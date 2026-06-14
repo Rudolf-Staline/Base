@@ -217,6 +217,22 @@ export const FileInputView = forwardRef<HTMLInputElement, FileInputProps>(
 );
 export const FileInput = createComponent<FileInputProps>("FileInput");
 
+export type DateTimeInputProps = Omit<InputProps, "type"> & {
+  value?: string;
+  defaultValue?: string;
+  minValue?: string;
+  maxValue?: string;
+  step?: number;
+  onValueChange?: (value: string) => void;
+};
+
+export const DateTimeInputView = forwardRef<HTMLInputElement, DateTimeInputProps>(
+  function DateTimeInputView(props, ref) {
+    return <InputView ref={ref} type="datetime-local" {...props} />;
+  },
+);
+export const DateTimeInput = createComponent<DateTimeInputProps>("DateTimeInput");
+
 export type DropzoneProps = FileInputProps & {
   text?: string;
   activeText?: string;
@@ -254,6 +270,13 @@ export const DropzoneView = forwardRef<HTMLInputElement, DropzoneProps>(
           className,
         )}
         onClick={() => !disabled && inputRef.current?.click()}
+        onKeyDown={(event) => {
+          if (disabled) return;
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            inputRef.current?.click();
+          }
+        }}
         onDragOver={(event) => {
           event.preventDefault();
           if (!disabled) setDragActive(true);

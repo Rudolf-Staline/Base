@@ -6,9 +6,10 @@ import {
   type UIChild,
 } from "@basekit/core";
 
-import { ButtonView, IconButtonView } from "./primitives/Button";
+import { ButtonView, IconButtonView, ButtonGroupView } from "./primitives/Button";
+import { ToggleView, ToggleGroupView } from "./primitives/ToggleGroup";
 import { InputView, TextareaView } from "./primitives/Input";
-import { TextInputView, NumberInputView, PasswordInputView, SearchInputView, EmailInputView, PhoneInputView, UrlInputView, FileInputView, DropzoneView } from "./primitives/SpecializedInputs";
+import { TextInputView, NumberInputView, PasswordInputView, SearchInputView, EmailInputView, PhoneInputView, UrlInputView, FileInputView, DropzoneView, DateTimeInputView } from "./primitives/SpecializedInputs";
 import { RadioView, RadioGroupView, CheckboxGroupView } from "./primitives/Selection";
 import { CalendarView, DatePickerView, TimePickerView } from "./primitives/Calendar";
 import { MultiSelectView, ComboboxView, AutocompleteView } from "./primitives/Choice";
@@ -53,6 +54,19 @@ import {
   DropdownView,
   TabsView,
 } from "./composition/Disclosure";
+import { TooltipView } from "./composition/Tooltip";
+import { PopoverView } from "./composition/Popover";
+import { PaginationView } from "./navigation/Pagination";
+import { BreadcrumbView } from "./navigation/Breadcrumb";
+import {
+  TableView,
+  TableHeaderView,
+  TableBodyView,
+  TableRowView,
+  TableHeadView,
+  TableCellView,
+  TableCaptionView,
+} from "./data/Table";
 import {
   AlertView,
   CalloutView,
@@ -90,6 +104,9 @@ const registryApi = createRegistry({
   // primitives
   Button: c(ButtonView),
   IconButton: c(IconButtonView),
+  ButtonGroup: c(ButtonGroupView),
+  Toggle: c(ToggleView),
+  ToggleGroup: c(ToggleGroupView),
   Input: c(InputView),
   TextInput: c(TextInputView),
   NumberInput: c(NumberInputView),
@@ -102,6 +119,7 @@ const registryApi = createRegistry({
   Dropzone: c(DropzoneView),
   Textarea: c(TextareaView),
   DateInput: c(DateInputView),
+  DateTimeInput: c(DateTimeInputView),
   Calendar: c(CalendarView),
   DatePicker: c(DatePickerView),
   TimePicker: c(TimePickerView),
@@ -147,6 +165,11 @@ const registryApi = createRegistry({
   Tabs: c(TabsView),
   Accordion: c(AccordionView),
   Dropdown: c(DropdownView),
+  Tooltip: c(TooltipView),
+  Popover: c(PopoverView),
+  // navigation
+  Pagination: c(PaginationView),
+  Breadcrumb: c(BreadcrumbView),
   // feedback
   Alert: c(AlertView),
   Callout: c(CalloutView),
@@ -156,6 +179,13 @@ const registryApi = createRegistry({
   Progress: c(ProgressView),
   // data
   DataTable: c(DataTableView),
+  Table: c(TableView),
+  TableHeader: c(TableHeaderView),
+  TableBody: c(TableBodyView),
+  TableRow: c(TableRowView),
+  TableHead: c(TableHeadView),
+  TableCell: c(TableCellView),
+  TableCaption: c(TableCaptionView),
   MetricCard: c(MetricCardView),
   StatBlock: c(StatBlockView),
   List: c(ListView),

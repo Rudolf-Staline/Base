@@ -1,4 +1,4 @@
-import { useId, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { cn, createComponent } from "@basekit/core";
 import { ButtonView } from "./Button";
 import { FieldShell } from "./Input";
@@ -91,10 +91,21 @@ export const ComboboxView = ({
   const [internalValue, setInternalValue] = useState(defaultValue ?? "");
   const [internalSearch, setInternalSearch] = useState(defaultSearchValue);
   const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const currentValue = value ?? internalValue;
   const currentSearch = searchValue ?? internalSearch;
   const selected = options.find((option) => option.value === currentValue);
   const filteredOptions = useFilteredOptions(options, currentSearch);
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointer = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node))
+        setOpen(false);
+    };
+    document.addEventListener("mousedown", onPointer);
+    return () => document.removeEventListener("mousedown", onPointer);
+  }, [open]);
 
   const setSearch = (next: string) => {
     setInternalSearch(next);
@@ -110,7 +121,7 @@ export const ComboboxView = ({
 
   return (
     <FieldShell id={id_} label={label} error={error} helperText={helperText} required={required} className={className}>
-      <div className="relative">
+      <div className="relative" ref={containerRef}>
         <input
           id={id_}
           name={name}
@@ -125,6 +136,17 @@ export const ComboboxView = ({
           disabled={disabled}
           required={required}
           onFocus={() => setOpen(true)}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") setOpen(false);
+            else if (event.key === "ArrowDown" && !open) setOpen(true);
+            else if (event.key === "Enter" && open) {
+              const first = filteredOptions.find((option) => !option.disabled);
+              if (first) {
+                event.preventDefault();
+                selectOption(first);
+              }
+            }
+          }}
           onChange={(event) => {
             setSearch(event.currentTarget.value);
             setOpen(true);

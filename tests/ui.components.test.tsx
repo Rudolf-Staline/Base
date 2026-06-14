@@ -219,7 +219,12 @@ describe("generic form controls", () => {
 
     const range = vi.fn();
     render(<RangeSliderView label="Range" defaultValue={[1, 9]} onValueChange={range} />);
-    fireEvent.change(screen.getAllByRole("slider", { name: "Range" })[0], { target: { value: "3" } });
+    // The two thumbs expose distinct accessible names so they aren't ambiguous.
+    const minThumb = screen.getByRole("slider", { name: "Range — minimum" });
+    const maxThumb = screen.getByRole("slider", { name: "Range — maximum" });
+    expect(minThumb).toBeInTheDocument();
+    expect(maxThumb).toBeInTheDocument();
+    fireEvent.change(minThumb, { target: { value: "3" } });
     expect(range).toHaveBeenCalledWith([3, 9]);
   });
 });
@@ -240,8 +245,14 @@ describe("registry and declarative renderer", () => {
       "TextInput", "NumberInput", "PasswordInput", "SearchInput", "EmailInput", "PhoneInput", "UrlInput",
       "FileInput", "Dropzone", "MultiSelect", "Combobox", "Autocomplete", "Slider", "RangeSlider",
       "FieldLabel", "FieldHint", "FieldError",
+      // Added in the V1 closing pass.
+      "ButtonGroup", "Toggle", "ToggleGroup", "Tooltip", "Popover", "Pagination", "Breadcrumb",
+      "Table", "TableHeader", "TableBody", "TableRow", "TableHead", "TableCell", "TableCaption",
+      "DateTimeInput",
     ];
     for (const key of keys) expect(defaultRegistry[key]).toBeTruthy();
+    // Components withdrawn in earlier passes must not reappear.
     expect(defaultRegistry.DateRangePicker).toBeUndefined();
+    expect(defaultRegistry.CommandPalette).toBeUndefined();
   });
 });

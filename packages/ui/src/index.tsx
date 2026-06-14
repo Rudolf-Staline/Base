@@ -62,10 +62,10 @@ export { TextInputView, TextInput, NumberInputView, NumberInput, PasswordInputVi
 export type { NumberInputProps, PasswordInputProps, SearchInputProps, FileInputProps, DropzoneProps } from "./primitives/SpecializedInputs";
 export { RadioView, Radio, RadioGroupView, RadioGroup, CheckboxGroupView, CheckboxGroup } from "./primitives/Selection";
 export type { RadioProps, RadioGroupProps, CheckboxGroupProps, ChoiceOption } from "./primitives/Selection";
-export { CalendarView, Calendar, DatePickerView, DatePicker, DateRangePickerView, DateRangePicker, TimePickerView, TimePicker } from "./primitives/Calendar";
-export type { CalendarProps, DatePickerProps } from "./primitives/Calendar";
+export { CalendarView, Calendar, DatePickerView, DatePicker, TimePickerView, TimePicker } from "./primitives/Calendar";
+export type { CalendarProps, DatePickerProps, TimePickerProps } from "./primitives/Calendar";
 export { MultiSelectView, MultiSelect, ComboboxView, Combobox, AutocompleteView, Autocomplete } from "./primitives/Choice";
-export type { MultiSelectProps } from "./primitives/Choice";
+export type { MultiSelectProps, ComboboxProps, AutocompleteProps } from "./primitives/Choice";
 export { SliderView, Slider, RangeSliderView, RangeSlider } from "./primitives/Slider";
 export type { SliderProps, RangeSliderProps } from "./primitives/Slider";
 export type { InputProps, TextareaProps } from "./primitives/Input";

@@ -10,7 +10,7 @@ import { ButtonView, IconButtonView } from "./primitives/Button";
 import { InputView, TextareaView } from "./primitives/Input";
 import { TextInputView, NumberInputView, PasswordInputView, SearchInputView, EmailInputView, PhoneInputView, UrlInputView, FileInputView, DropzoneView } from "./primitives/SpecializedInputs";
 import { RadioView, RadioGroupView, CheckboxGroupView } from "./primitives/Selection";
-import { CalendarView, DatePickerView, DateRangePickerView, TimePickerView } from "./primitives/Calendar";
+import { CalendarView, DatePickerView, TimePickerView } from "./primitives/Calendar";
 import { MultiSelectView, ComboboxView, AutocompleteView } from "./primitives/Choice";
 import { SliderView, RangeSliderView } from "./primitives/Slider";
 import { DateInputView } from "./primitives/DateInput";
@@ -104,7 +104,6 @@ const registryApi = createRegistry({
   DateInput: c(DateInputView),
   Calendar: c(CalendarView),
   DatePicker: c(DatePickerView),
-  DateRangePicker: c(DateRangePickerView),
   TimePicker: c(TimePickerView),
   Select: c(SelectView),
   MultiSelect: c(MultiSelectView),

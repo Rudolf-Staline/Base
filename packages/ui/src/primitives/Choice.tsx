@@ -1,8 +1,185 @@
-import { createComponent } from "@basekit/core";
-import { SelectView, type SelectProps } from "./Select";
+import { useId, useMemo, useState, type ReactNode } from "react";
+import { cn, createComponent } from "@basekit/core";
+import { ButtonView } from "./Button";
 import { FieldShell } from "./Input";
-export const ComboboxView = (props: SelectProps) => <SelectView {...props} />; export const Combobox = createComponent<SelectProps>("Combobox");
-export const AutocompleteView = (props: SelectProps) => <SelectView {...props} />; export const Autocomplete = createComponent<SelectProps>("Autocomplete");
-export type MultiSelectProps = Omit<SelectProps,"value"|"defaultValue"|"onValueChange"> & { values?: string[]; defaultValues?: string[]; onValuesChange?: (values: string[]) => void; searchable?: boolean; clearable?: boolean; onSearchChange?: (value:string)=>void };
-export const MultiSelectView = ({ id, name, label, options, values, defaultValues, error, helperText, disabled, required, className, onValuesChange, testId }: MultiSelectProps) => <FieldShell id={id ?? name ?? "multiselect"} label={label} error={error} helperText={helperText} required={required} className={className}><select id={id ?? name ?? "multiselect"} name={name} multiple value={values} defaultValue={defaultValues} disabled={disabled} data-testid={testId} className="min-h-28 rounded-md border border-input bg-surface p-2 text-bk-sm" onChange={(e)=>onValuesChange?.(Array.from(e.currentTarget.selectedOptions).map(o=>o.value))}>{options.map(o=><option key={o.value} value={o.value} disabled={o.disabled}>{o.label}</option>)}</select></FieldShell>;
+import { type SelectOption, type SelectProps } from "./Select";
+
+export type MultiSelectProps = Omit<SelectProps, "value" | "defaultValue" | "onValueChange"> & {
+  values?: string[];
+  defaultValues?: string[];
+  onValuesChange?: (values: string[]) => void;
+};
+
+export const MultiSelectView = ({
+  id,
+  name,
+  label,
+  options,
+  values,
+  defaultValues,
+  error,
+  helperText,
+  disabled,
+  required,
+  className,
+  onValuesChange,
+  testId,
+}: MultiSelectProps) => {
+  const generatedId = useId();
+  const id_ = id ?? name ?? generatedId;
+
+  return (
+    <FieldShell id={id_} label={label} error={error} helperText={helperText} required={required} className={className}>
+      <select
+        id={id_}
+        name={name}
+        multiple
+        value={values}
+        defaultValue={defaultValues}
+        disabled={disabled}
+        required={required}
+        data-testid={testId}
+        aria-invalid={error ? true : undefined}
+        className="min-h-28 rounded-md border border-input bg-surface p-2 text-bk-sm"
+        onChange={(event) =>
+          onValuesChange?.(Array.from(event.currentTarget.selectedOptions).map((option) => option.value))
+        }
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value} disabled={option.disabled}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </FieldShell>
+  );
+};
 export const MultiSelect = createComponent<MultiSelectProps>("MultiSelect");
+
+export type ComboboxProps = Omit<SelectProps, "onValueChange"> & {
+  searchValue?: string;
+  defaultSearchValue?: string;
+  clearable?: boolean;
+  emptyText?: ReactNode;
+  onValueChange?: (value: string) => void;
+  onSearchChange?: (value: string) => void;
+};
+
+export const ComboboxView = ({
+  id,
+  name,
+  label,
+  options,
+  value,
+  defaultValue,
+  searchValue,
+  defaultSearchValue = "",
+  placeholder,
+  emptyText = "Aucune option",
+  clearable,
+  error,
+  helperText,
+  disabled,
+  required,
+  className,
+  testId,
+  onValueChange,
+  onSearchChange,
+}: ComboboxProps) => {
+  const generatedId = useId();
+  const id_ = id ?? name ?? generatedId;
+  const [internalValue, setInternalValue] = useState(defaultValue ?? "");
+  const [internalSearch, setInternalSearch] = useState(defaultSearchValue);
+  const [open, setOpen] = useState(false);
+  const currentValue = value ?? internalValue;
+  const currentSearch = searchValue ?? internalSearch;
+  const selected = options.find((option) => option.value === currentValue);
+  const filteredOptions = useFilteredOptions(options, currentSearch);
+
+  const setSearch = (next: string) => {
+    setInternalSearch(next);
+    onSearchChange?.(next);
+  };
+  const selectOption = (option: SelectOption) => {
+    if (option.disabled) return;
+    setInternalValue(option.value);
+    setSearch(option.label);
+    onValueChange?.(option.value);
+    setOpen(false);
+  };
+
+  return (
+    <FieldShell id={id_} label={label} error={error} helperText={helperText} required={required} className={className}>
+      <div className="relative">
+        <input
+          id={id_}
+          name={name}
+          role="combobox"
+          aria-expanded={open}
+          aria-controls={`${id_}-listbox`}
+          aria-invalid={error ? true : undefined}
+          data-testid={testId}
+          className="h-10 w-full rounded-md border border-input bg-surface px-3 pr-20 text-bk-sm outline-none focus:ring-2 focus:ring-ring/40"
+          value={currentSearch || selected?.label || ""}
+          placeholder={placeholder}
+          disabled={disabled}
+          required={required}
+          onFocus={() => setOpen(true)}
+          onChange={(event) => {
+            setSearch(event.currentTarget.value);
+            setOpen(true);
+          }}
+        />
+        {clearable && (currentValue || currentSearch) && (
+          <ButtonView
+            type="button"
+            size="xs"
+            variant="ghost"
+            text="Effacer"
+            aria-label="Effacer la sélection"
+            className="absolute right-1 top-1"
+            onClick={() => {
+              setInternalValue("");
+              setSearch("");
+              onValueChange?.("");
+            }}
+          />
+        )}
+        {open && !disabled && (
+          <div id={`${id_}-listbox`} role="listbox" className="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded-md border border-border bg-surface p-1 shadow-lg">
+            {filteredOptions.length === 0 ? (
+              <div className="px-2 py-1.5 text-bk-sm text-muted-foreground">{emptyText}</div>
+            ) : (
+              filteredOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="option"
+                  aria-selected={option.value === currentValue}
+                  disabled={option.disabled}
+                  className={cn("block w-full rounded px-2 py-1.5 text-left text-bk-sm hover:bg-muted", option.value === currentValue && "bg-primary text-primary-foreground")}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => selectOption(option)}
+                >
+                  {option.label}
+                </button>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+    </FieldShell>
+  );
+};
+export const Combobox = createComponent<ComboboxProps>("Combobox");
+
+export type AutocompleteProps = ComboboxProps;
+export const AutocompleteView = ComboboxView;
+export const Autocomplete = createComponent<AutocompleteProps>("Autocomplete");
+
+const useFilteredOptions = (options: SelectOption[], search: string) =>
+  useMemo(() => {
+    const normalized = search.trim().toLowerCase();
+    if (!normalized) return options;
+    return options.filter((option) => option.label.toLowerCase().includes(normalized));
+  }, [options, search]);

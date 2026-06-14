@@ -93,6 +93,8 @@ export type InputProps = {
   rightSlot?: ReactNode;
   autoComplete?: string;
   accept?: string;
+  multiple?: boolean;
+  step?: number | string;
   testId?: string;
   onChange?: InputHTMLAttributes<HTMLInputElement>["onChange"];
   /** Value-first change handler — the ergonomic default. */
@@ -126,6 +128,8 @@ export const InputView = forwardRef<HTMLInputElement, InputProps>(
       rightSlot,
       autoComplete,
       accept,
+      multiple,
+      step,
       testId,
       onChange,
       onChangeValue,
@@ -169,6 +173,8 @@ export const InputView = forwardRef<HTMLInputElement, InputProps>(
             readOnly={readOnly}
             autoComplete={autoComplete}
             accept={accept}
+            multiple={multiple}
+            step={step}
             data-testid={testId}
             aria-invalid={error ? true : undefined}
             aria-describedby={describedBy}

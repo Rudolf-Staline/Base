@@ -49,8 +49,25 @@ export {
   Button,
   IconButtonView,
   IconButton,
+  ButtonGroupView,
+  ButtonGroup,
 } from "./primitives/Button";
-export type { ButtonProps, IconButtonProps } from "./primitives/Button";
+export type {
+  ButtonProps,
+  IconButtonProps,
+  ButtonGroupProps,
+} from "./primitives/Button";
+export {
+  ToggleView,
+  Toggle,
+  ToggleGroupView,
+  ToggleGroup,
+} from "./primitives/ToggleGroup";
+export type {
+  ToggleProps,
+  ToggleGroupProps,
+  ToggleGroupOption,
+} from "./primitives/ToggleGroup";
 export {
   InputView,
   Input,
@@ -58,8 +75,8 @@ export {
   Textarea,
   FieldShell,
 } from "./primitives/Input";
-export { TextInputView, TextInput, NumberInputView, NumberInput, PasswordInputView, PasswordInput, SearchInputView, SearchInput, EmailInputView, EmailInput, PhoneInputView, PhoneInput, UrlInputView, UrlInput, FileInputView, FileInput, DropzoneView, Dropzone } from "./primitives/SpecializedInputs";
-export type { NumberInputProps, PasswordInputProps, SearchInputProps, FileInputProps, DropzoneProps } from "./primitives/SpecializedInputs";
+export { TextInputView, TextInput, NumberInputView, NumberInput, PasswordInputView, PasswordInput, SearchInputView, SearchInput, EmailInputView, EmailInput, PhoneInputView, PhoneInput, UrlInputView, UrlInput, FileInputView, FileInput, DropzoneView, Dropzone, DateTimeInputView, DateTimeInput } from "./primitives/SpecializedInputs";
+export type { NumberInputProps, PasswordInputProps, SearchInputProps, FileInputProps, DropzoneProps, DateTimeInputProps } from "./primitives/SpecializedInputs";
 export { RadioView, Radio, RadioGroupView, RadioGroup, CheckboxGroupView, CheckboxGroup } from "./primitives/Selection";
 export type { RadioProps, RadioGroupProps, CheckboxGroupProps, ChoiceOption } from "./primitives/Selection";
 export { CalendarView, Calendar, DatePickerView, DatePicker, TimePickerView, TimePicker } from "./primitives/Calendar";
@@ -197,6 +214,16 @@ export type {
   DropdownProps,
   DropdownItem,
 } from "./composition/Disclosure";
+export { TooltipView, Tooltip } from "./composition/Tooltip";
+export type { TooltipProps, TooltipPlacement } from "./composition/Tooltip";
+export { PopoverView, Popover } from "./composition/Popover";
+export type { PopoverProps, PopoverPlacement } from "./composition/Popover";
+
+// Navigation
+export { PaginationView, Pagination } from "./navigation/Pagination";
+export type { PaginationProps } from "./navigation/Pagination";
+export { BreadcrumbView, Breadcrumb } from "./navigation/Breadcrumb";
+export type { BreadcrumbProps, BreadcrumbItem } from "./navigation/Breadcrumb";
 
 // Feedback
 export {
@@ -227,6 +254,28 @@ export { ToastProvider, useToast, type Toast } from "./feedback/Toast";
 // Data
 export { DataTableView, DataTable, Column } from "./data/DataTable";
 export type { DataTableProps, DataTableColumn } from "./data/DataTable";
+export {
+  TableView,
+  Table,
+  TableHeaderView,
+  TableHeader,
+  TableBodyView,
+  TableBody,
+  TableRowView,
+  TableRow,
+  TableHeadView,
+  TableHead,
+  TableCellView,
+  TableCell,
+  TableCaptionView,
+  TableCaption,
+} from "./data/Table";
+export type {
+  TableProps,
+  TableSectionProps,
+  TableRowProps,
+  TableCellProps,
+} from "./data/Table";
 export {
   MetricCardView,
   MetricCard,

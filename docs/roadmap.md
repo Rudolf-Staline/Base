@@ -4,19 +4,21 @@ Ces composants ne sont pas annoncés comme disponibles dans la documentation pri
 
 ## Composants à venir
 
-- ButtonGroup
-- Toggle
-- ToggleGroup
-- Popover
-- Tooltip
-- Pagination
-- Breadcrumb
-- Table
-- DateTimeInput
-- DateRangePicker avancé
-- Combobox avancé
-- Autocomplete avancé
 - CommandPalette
+- DateRangePicker (sélection de plage avancée)
+- Combobox avancé (navigation clavier complète : `ArrowUp`/`ArrowDown` parcourant les options, `aria-activedescendant`)
+- Autocomplete avancé (suggestions asynchrones, mise en surbrillance des correspondances)
+
+## Limites connues des composants livrés
+
+Quelques composants sont des versions minimales honnêtes. Leurs limites assumées :
+
+- **Combobox / Autocomplete** : filtrage local, sélection, `clear`, `Escape` pour fermer et
+  `Enter` pour choisir la première option. La navigation flèche-par-flèche dans la liste et
+  `aria-activedescendant` complet sont en roadmap.
+- **Tooltip / Popover** : positionnement statique via `placement` (pas de moteur anti-collision).
+- **Table** : table de présentation pour contenu libre. Pour une table pilotée par données
+  (colonnes, tri, états de chargement/vide, sélection), utiliser `DataTable`.
 
 ## Critère d'entrée dans la documentation principale
 

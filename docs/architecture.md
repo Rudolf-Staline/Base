@@ -50,7 +50,7 @@ mêmes arbres `UINode`.
 
 ### `@basekit/ui`
 
-La **bibliothèque de composants** (~50). Pour chaque composant elle fournit `XView` (React),
+La **bibliothèque de composants** (~65). Pour chaque composant elle fournit `XView` (React),
 `X` (fabrique via `createComponent`) et `XProps`. Elle assemble aussi le `defaultRegistry`
 (nom → `XView`) et expose `RenderNode`, le composant React qui rend un arbre déclaratif.
 Elle réexporte le page builder de `core` pour une ergonomie « un seul import ».

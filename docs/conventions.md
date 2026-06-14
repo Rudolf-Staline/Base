@@ -1,7 +1,7 @@
 # Conventions
 
 Ces règles maintiennent BaseKit cohérent, re-thématisable et facile à étendre. Elles sont
-volontairement strictes : c'est ce qui permet aux ~50 composants de se comporter de façon
+volontairement strictes : c'est ce qui permet aux ~65 composants de se comporter de façon
 prévisible.
 
 ## 1. Pas de logique métier dans l'UI
@@ -66,7 +66,7 @@ et `renderNode` est déterministe.
 - **Trois exports par composant** : `XView` (React), `X` (fabrique `createComponent`),
   `XProps` (types).
 - **Dossiers par catégorie** dans `packages/ui/src/` : `primitives/`, `layout/`,
-  `composition/`, `feedback/`, `data/`, `form/`.
+  `composition/`, `navigation/`, `feedback/`, `data/`, `form/`.
 - Un fichier peut regrouper plusieurs composants proches (`primitives/Misc.tsx` :
   `Badge`/`Link`/`Avatar`/`Divider`/`Kbd`/`Spinner`).
 - La clé du registry, le nom passé à `createComponent` et le préfixe des exports sont **le même
@@ -116,8 +116,8 @@ et `renderNode` est déterministe.
    export type { StatProps } from "./data/Stat";
    ```
 
-4. **Ajouter une démo** dans le playground (`apps/playground/src/pages/Components.tsx` ou une
-   page dédiée) pour le rendre visible et vérifiable en clair et en sombre.
+4. **Ajouter une démo** dans le playground (`apps/playground/src/pages/ShowcasePages.tsx`) pour
+   le rendre visible et vérifiable en clair et en sombre.
 
 Une fois ces quatre étapes faites, le composant est utilisable en JSX (`<StatView />`) **et** en
 déclaratif (`Stat({ label, value })`), et rendu correctement par `RenderNode`.

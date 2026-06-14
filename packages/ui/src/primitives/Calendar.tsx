@@ -120,12 +120,17 @@ export type DatePickerProps = CalendarProps & {
   error?: ReactNode;
   helperText?: ReactNode;
   onValueChange?: (value: string) => void;
+  onOpenChange?: (open: boolean) => void;
 };
 
-export const DatePickerView = ({ id, name, label, placeholder = "YYYY-MM-DD", clearable, error, helperText, onValueChange, value, defaultValue, minDate, maxDate, disabledDates, disabled, ...props }: DatePickerProps) => {
-  const [open, setOpen] = useState(false);
+export const DatePickerView = ({ id, name, label, placeholder = "YYYY-MM-DD", clearable, error, helperText, onValueChange, onOpenChange, value, defaultValue, minDate, maxDate, disabledDates, disabled, ...props }: DatePickerProps) => {
+  const [open, setInternalOpen] = useState(false);
   const [internalValue, setInternalValue] = useState(typeof defaultValue === "string" ? defaultValue : defaultValue ? toIsoDate(defaultValue) : "");
   const currentValue = typeof value === "string" ? value : value ? toIsoDate(value) : internalValue;
+  const setOpen = (next: boolean) => {
+    setInternalOpen(next);
+    onOpenChange?.(next);
+  };
   const setValue = (next: string) => {
     setInternalValue(next);
     onValueChange?.(next);
@@ -146,9 +151,10 @@ export const DatePickerView = ({ id, name, label, placeholder = "YYYY-MM-DD", cl
         onFocus={() => setOpen(true)}
         rightSlot={
           clearable && currentValue ? (
-            <ButtonView type="button" size="xs" variant="ghost" text="Effacer" aria-label="Effacer la date" onClick={() => setValue("")} />
+            // Clearing must not open the calendar — close it explicitly.
+            <ButtonView type="button" size="xs" variant="ghost" text="Effacer" aria-label="Effacer la date" onMouseDown={(event) => event.preventDefault()} onClick={() => { setValue(""); setOpen(false); }} />
           ) : (
-            <ButtonView type="button" size="xs" variant="ghost" text="Calendrier" aria-label="Ouvrir le calendrier" onClick={() => setOpen(!open)} />
+            <ButtonView type="button" size="xs" variant="ghost" text="Calendrier" aria-label="Ouvrir le calendrier" onMouseDown={(event) => event.preventDefault()} onClick={() => setOpen(!open)} />
           )
         }
       />

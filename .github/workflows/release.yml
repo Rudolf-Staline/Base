@@ -1,0 +1,53 @@
+name: Release
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write # créer le commit/tag de version et la "Version Packages" PR
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          # --- Publication npm (par défaut) ---
+          registry-url: "https://registry.npmjs.org"
+          # --- Alternative GitHub Packages : commenter la ligne ci-dessus et
+          #     décommenter les deux suivantes (le scope des packages doit alors
+          #     correspondre au propriétaire, ex. @rudolf-staline/*) :
+          # registry-url: "https://npm.pkg.github.com"
+          # scope: "@rudolf-staline"
+
+      - run: pnpm install --frozen-lockfile
+
+      # Crée/maj une PR "Version Packages" tant qu'il y a des changesets en attente ;
+      # quand cette PR est mergée sur main, exécute `pnpm release` (build + publish).
+      - name: Create Release PR or publish
+        uses: changesets/action@v1
+        with:
+          version: pnpm version
+          publish: pnpm release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # npm : créer un secret NPM_TOKEN (Automation token) dans le repo.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # GitHub Packages : remplacer la ligne ci-dessus par :
+          # NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

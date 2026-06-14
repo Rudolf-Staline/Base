@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=9"
+  },
   "scripts": {
     "dev": "pnpm --filter @basekit/playground dev",
     "dev:docs": "pnpm --filter @basekit/docs dev",
@@ -17,9 +21,13 @@
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
     "gen:css": "pnpm --filter @basekit/tokens gen:css",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "pnpm build:packages && changeset publish",
     "clean": "tsc -b --clean && pnpm -r clean && rm -rf node_modules"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.11",
     "@eslint/js": "^9.18.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@types/node": "^22.10.5",

@@ -32,6 +32,27 @@ pnpm build        # build des packages puis des apps
 pnpm gen:css      # régénère packages/tokens/theme.css
 ```
 
+## Publication
+
+Les packages publiables (`@basekit/tokens`, `@basekit/core`, `@basekit/ui`, `@basekit/api`)
+sont versionnés en lockstep via [Changesets](.changeset/README.md) :
+
+```bash
+pnpm changeset   # décrire un changement (patch/minor/major)
+pnpm version     # appliquer les changesets en attente (bump + changelog)
+pnpm release     # build des packages puis publish
+```
+
+En CI, `.github/workflows/release.yml` ouvre une PR « Version Packages » et publie au merge
+sur `main`. Cible : **npm public, scope `@basekit`**. Runbook complet (setup org/token,
+prerelease pour consommer en avance) dans [`docs/publishing.md`](docs/publishing.md).
+
+## Consommer BaseKit dans une app
+
+Une fois publié, voir le starter [`packages/templates/react-vite`](packages/templates/README.md) :
+`pnpm add @basekit/ui @basekit/core @basekit/tokens @basekit/api`, brancher `basekitPreset`
+dans Tailwind et importer `@basekit/tokens/theme.css`.
+
 ## Composants réellement disponibles
 
 - **Actions** : Button, IconButton, ButtonGroup, Toggle, ToggleGroup.
@@ -93,6 +114,7 @@ Page({
 - [`docs/page-builder.md`](docs/page-builder.md) — pages déclaratives (`createPage`, `usePageRuntime`).
 - [`docs/tokens.md`](docs/tokens.md) — design tokens et thèmes.
 - [`docs/conventions.md`](docs/conventions.md) — règles d'ajout de composants.
+- [`docs/publishing.md`](docs/publishing.md) — versioning Changesets et publication npm.
 - [`docs/roadmap.md`](docs/roadmap.md) — ce qui reste à faire et les limites connues.
 
 ## Roadmap

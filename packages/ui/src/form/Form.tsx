@@ -197,3 +197,14 @@ export const FilterBarView = ({
 );
 
 export const FilterBar = createComponent<FilterBarProps>("FilterBar");
+
+/* Field primitives ------------------------------------------------------ */
+export type FieldLabelProps = { children?: ReactNode; htmlFor?: string; required?: boolean; className?: string };
+export const FieldLabelView = ({ children, htmlFor, required, className }: FieldLabelProps) => <label htmlFor={htmlFor} className={cn("text-bk-sm font-medium text-foreground", className)}>{children}{required && <span className="text-danger"> *</span>}</label>;
+export const FieldLabel = createComponent<FieldLabelProps>("FieldLabel");
+export type FieldHintProps = { children?: ReactNode; className?: string };
+export const FieldHintView = ({ children, className }: FieldHintProps) => <p className={cn("text-bk-sm text-muted-foreground", className)}>{children}</p>;
+export const FieldHint = createComponent<FieldHintProps>("FieldHint");
+export type FieldErrorProps = { children?: ReactNode; className?: string };
+export const FieldErrorView = ({ children, className }: FieldErrorProps) => <p role="alert" className={cn("text-bk-sm text-danger", className)}>{children}</p>;
+export const FieldError = createComponent<FieldErrorProps>("FieldError");

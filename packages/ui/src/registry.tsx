@@ -8,6 +8,11 @@ import {
 
 import { ButtonView, IconButtonView } from "./primitives/Button";
 import { InputView, TextareaView } from "./primitives/Input";
+import { TextInputView, NumberInputView, PasswordInputView, SearchInputView, EmailInputView, PhoneInputView, UrlInputView, FileInputView, DropzoneView } from "./primitives/SpecializedInputs";
+import { RadioView, RadioGroupView, CheckboxGroupView } from "./primitives/Selection";
+import { CalendarView, DatePickerView, DateRangePickerView, TimePickerView } from "./primitives/Calendar";
+import { MultiSelectView, ComboboxView, AutocompleteView } from "./primitives/Choice";
+import { SliderView, RangeSliderView } from "./primitives/Slider";
 import { DateInputView } from "./primitives/DateInput";
 import { SelectView } from "./primitives/Select";
 import { CheckboxView, SwitchView } from "./primitives/Toggle";
@@ -68,6 +73,9 @@ import {
   FormActionsView,
   FormFieldView,
   FormSectionView,
+  FieldErrorView,
+  FieldHintView,
+  FieldLabelView,
   FormView,
 } from "./form/Form";
 
@@ -83,11 +91,32 @@ const registryApi = createRegistry({
   Button: c(ButtonView),
   IconButton: c(IconButtonView),
   Input: c(InputView),
+  TextInput: c(TextInputView),
+  NumberInput: c(NumberInputView),
+  PasswordInput: c(PasswordInputView),
+  SearchInput: c(SearchInputView),
+  EmailInput: c(EmailInputView),
+  PhoneInput: c(PhoneInputView),
+  UrlInput: c(UrlInputView),
+  FileInput: c(FileInputView),
+  Dropzone: c(DropzoneView),
   Textarea: c(TextareaView),
   DateInput: c(DateInputView),
+  Calendar: c(CalendarView),
+  DatePicker: c(DatePickerView),
+  DateRangePicker: c(DateRangePickerView),
+  TimePicker: c(TimePickerView),
   Select: c(SelectView),
+  MultiSelect: c(MultiSelectView),
+  Combobox: c(ComboboxView),
+  Autocomplete: c(AutocompleteView),
+  Radio: c(RadioView),
+  RadioGroup: c(RadioGroupView),
   Checkbox: c(CheckboxView),
+  CheckboxGroup: c(CheckboxGroupView),
   Switch: c(SwitchView),
+  Slider: c(SliderView),
+  RangeSlider: c(RangeSliderView),
   Text: c(TextView),
   Heading: c(HeadingView),
   Badge: c(BadgeView),
@@ -137,6 +166,9 @@ const registryApi = createRegistry({
   Form: c(FormView),
   FormSection: c(FormSectionView),
   FormField: c(FormFieldView),
+  FieldLabel: c(FieldLabelView),
+  FieldHint: c(FieldHintView),
+  FieldError: c(FieldErrorView),
   FormActions: c(FormActionsView),
   FilterBar: c(FilterBarView),
 });

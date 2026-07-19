@@ -1,6 +1,7 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { cn, createComponent } from "@basekit/core";
+import { useDialogLayer } from "../internal/useDialogLayer";
 import { IconButtonView } from "../primitives/Button";
 
 export type ModalProps = {
@@ -11,8 +12,12 @@ export type ModalProps = {
   children?: ReactNode;
   footer?: ReactNode;
   size?: "sm" | "md" | "lg" | "xl";
+  /** Accessible name used when no visible title is provided. */
+  "aria-label"?: string;
   /** Close when clicking the backdrop (default true). */
   dismissable?: boolean;
+  /** Close when pressing Escape (default true). */
+  closeOnEscape?: boolean;
   className?: string;
 };
 
@@ -31,25 +36,22 @@ export const ModalView = ({
   children,
   footer,
   size = "md",
+  "aria-label": ariaLabel,
   dismissable = true,
+  closeOnEscape = true,
   className,
 }: ModalProps) => {
   const panelRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  const descriptionId = useId();
+  const hasHeader = title != null || description != null;
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    panelRef.current?.focus();
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = previous;
-    };
-  }, [open, onClose]);
+  useDialogLayer({
+    open,
+    onClose,
+    containerRef: panelRef,
+    closeOnEscape,
+  });
 
   if (!open || typeof document === "undefined") return null;
 
@@ -64,7 +66,9 @@ export const ModalView = ({
         ref={panelRef}
         role="dialog"
         aria-modal="true"
-        aria-label={typeof title === "string" ? title : undefined}
+        aria-labelledby={title != null ? titleId : undefined}
+        aria-describedby={description != null ? descriptionId : undefined}
+        aria-label={title == null ? ariaLabel : undefined}
         tabIndex={-1}
         className={cn(
           "relative w-full rounded-xl border border-border bg-surface shadow-strong outline-none",
@@ -72,16 +76,22 @@ export const ModalView = ({
           className,
         )}
       >
-        {(title != null || description != null) && (
+        {hasHeader ? (
           <div className="flex items-start justify-between gap-4 border-b border-border p-5">
             <div className="space-y-1">
               {title != null && (
-                <h2 className="text-lg font-semibold text-foreground">
+                <h2
+                  id={titleId}
+                  className="text-lg font-semibold text-foreground"
+                >
                   {title}
                 </h2>
               )}
               {description != null && (
-                <p className="text-bk-sm text-muted-foreground">
+                <p
+                  id={descriptionId}
+                  className="text-bk-sm text-muted-foreground"
+                >
                   {description}
                 </p>
               )}
@@ -93,8 +103,16 @@ export const ModalView = ({
               size="sm"
             />
           </div>
+        ) : (
+          <IconButtonView
+            icon="close"
+            aria-label="Fermer"
+            onClick={onClose}
+            size="sm"
+            className="absolute right-3 top-3"
+          />
         )}
-        <div className="p-5">{children}</div>
+        <div className={cn("p-5", !hasHeader && "pr-14")}>{children}</div>
         {footer != null && (
           <div className="flex items-center justify-end gap-2 border-t border-border p-5">
             {footer}
@@ -119,19 +137,26 @@ export const DrawerView = ({
   open,
   onClose,
   title,
+  description,
   children,
   footer,
   side = "right",
   width = "22rem",
+  "aria-label": ariaLabel,
   dismissable = true,
+  closeOnEscape = true,
   className,
 }: DrawerProps) => {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  const descriptionId = useId();
+
+  useDialogLayer({
+    open,
+    onClose,
+    containerRef: panelRef,
+    closeOnEscape,
+  });
 
   if (!open || typeof document === "undefined") return null;
 
@@ -143,26 +168,46 @@ export const DrawerView = ({
         aria-hidden
       />
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
+        aria-labelledby={title != null ? titleId : undefined}
+        aria-describedby={description != null ? descriptionId : undefined}
+        aria-label={title == null ? ariaLabel : undefined}
+        tabIndex={-1}
         className={cn(
-          "absolute inset-y-0 flex w-full flex-col border-border bg-surface shadow-strong",
+          "absolute inset-y-0 flex w-full flex-col border-border bg-surface shadow-strong outline-none",
           side === "right" ? "right-0 border-l" : "left-0 border-r",
           className,
         )}
         style={{ maxWidth: width }}
       >
-        {title != null && (
-          <div className="flex items-center justify-between border-b border-border p-5">
-            <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-            <IconButtonView
-              icon="close"
-              aria-label="Fermer"
-              onClick={onClose}
-              size="sm"
-            />
+        <div className="flex items-start justify-between gap-4 border-b border-border p-5">
+          <div className="space-y-1">
+            {title != null && (
+              <h2
+                id={titleId}
+                className="text-lg font-semibold text-foreground"
+              >
+                {title}
+              </h2>
+            )}
+            {description != null && (
+              <p
+                id={descriptionId}
+                className="text-bk-sm text-muted-foreground"
+              >
+                {description}
+              </p>
+            )}
           </div>
-        )}
+          <IconButtonView
+            icon="close"
+            aria-label="Fermer"
+            onClick={onClose}
+            size="sm"
+          />
+        </div>
         <div className="flex-1 overflow-y-auto p-5">{children}</div>
         {footer != null && (
           <div className="border-t border-border p-5">{footer}</div>
